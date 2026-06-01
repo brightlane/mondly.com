@@ -24,11 +24,17 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          clean: true
+
+      - name: Show content.json status
+        run: |
+          ls -lah
+          test -f content.json
+          wc -c content.json
+          sed -n '1,20p' content.json
 
       - name: Validate content.json
         run: |
-          test -f content.json
-          test -s content.json
           python -m json.tool content.json > /dev/null
 
       - name: Set up Python
