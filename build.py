@@ -37,221 +37,49 @@ def nav_html():
 
 CSS = """
 :root{
-  --bg:#07111f;
-  --card:#101a2d;
-  --text:#e5e7eb;
-  --muted:#94a3b8;
-  --line:#23314a;
-  --accent:#22c55e;
-  --accent2:#38bdf8;
-  --shadow:0 24px 70px rgba(0,0,0,.35);
-  --max:1160px;
+  --bg:#07111f; --card:#101a2d; --text:#e5e7eb; --muted:#94a3b8; --line:#23314a;
+  --accent:#22c55e; --shadow:0 24px 70px rgba(0,0,0,.35); --max:1160px;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{
-  margin:0;
-  font-family:Inter,Arial,Helvetica,sans-serif;
-  background:
-    radial-gradient(circle at top left, rgba(56,189,248,.15), transparent 30%),
-    radial-gradient(circle at top right, rgba(34,197,94,.12), transparent 30%),
-    linear-gradient(180deg,#07111f 0%,#08101d 100%);
-  color:var(--text);
-  line-height:1.6;
-  text-rendering:optimizeLegibility;
+  margin:0;font-family:Inter,Arial,Helvetica,sans-serif;
+  background:radial-gradient(circle at top left, rgba(56,189,248,.15), transparent 30%),
+             radial-gradient(circle at top right, rgba(34,197,94,.12), transparent 30%),
+             linear-gradient(180deg,#07111f 0%,#08101d 100%);
+  color:var(--text);line-height:1.6;text-rendering:optimizeLegibility;
 }
 a{color:inherit;text-decoration:none}
 .wrap{max-width:var(--max);margin:0 auto;padding:18px}
 .nav{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.nav a{
-  padding:8px 12px;
-  border:1px solid var(--line);
-  border-radius:999px;
-  background:rgba(255,255,255,.03);
-  color:#dbeafe;
-}
-.hero{
-  border:1px solid var(--line);
-  border-radius:28px;
-  box-shadow:var(--shadow);
-  overflow:hidden;
-  background:linear-gradient(180deg, rgba(16,26,45,.98), rgba(10,18,34,.98));
-}
-.hero-inner{
-  display:grid;
-  grid-template-columns:1.1fr .9fr;
-  gap:24px;
-  padding:34px;
-  align-items:center;
-}
-h1{
-  margin:12px 0 14px;
-  font-size:clamp(2rem,5vw,4.25rem);
-  line-height:1.02;
-  letter-spacing:-.04em;
-}
-.lead{
-  font-size:1.08rem;
-  color:#cbd5e1;
-  margin:0 0 22px;
-  max-width:62ch;
-}
-.pill{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  border:1px solid rgba(34,197,94,.22);
-  background:rgba(34,197,94,.1);
-  color:#bbf7d0;
-  padding:7px 12px;
-  border-radius:999px;
-  font-size:.86rem;
-  font-weight:800;
-}
+.nav a{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.03);color:#dbeafe}
+.hero{border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);overflow:hidden;background:linear-gradient(180deg, rgba(16,26,45,.98), rgba(10,18,34,.98))}
+.hero-inner{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;padding:34px;align-items:center}
+h1{margin:12px 0 14px;font-size:clamp(2rem,5vw,4.25rem);line-height:1.02;letter-spacing:-.04em}
+.lead{font-size:1.08rem;color:#cbd5e1;margin:0 0 22px;max-width:62ch}
+.pill{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(34,197,94,.22);background:rgba(34,197,94,.1);color:#bbf7d0;padding:7px 12px;border-radius:999px;font-size:.86rem;font-weight:800}
 .btns{display:flex;gap:12px;flex-wrap:wrap}
-.btn{
-  min-height:52px;
-  padding:14px 20px;
-  border-radius:16px;
-  font-weight:900;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  border:1px solid transparent;
-}
-.primary{
-  background:linear-gradient(135deg,var(--accent),#16a34a);
-  color:#04120a;
-}
-.secondary{
-  background:rgba(255,255,255,.03);
-  border-color:var(--line);
-}
-.grid{
-  margin-top:22px;
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:18px;
-}
-.card{
-  background:rgba(16,26,45,.96);
-  border:1px solid var(--line);
-  border-radius:24px;
-  padding:22px;
-  box-shadow:0 12px 36px rgba(0,0,0,.16);
-}
+.btn{min-height:52px;padding:14px 20px;border-radius:16px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;border:1px solid transparent}
+.primary{background:linear-gradient(135deg,var(--accent),#16a34a);color:#04120a}
+.secondary{background:rgba(255,255,255,.03);border-color:var(--line)}
+.grid{margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:rgba(16,26,45,.96);border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:0 12px 36px rgba(0,0,0,.16)}
 .card p,.card li{color:var(--muted)}
 .card ul{margin:0;padding-left:18px}
-.steps{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:18px;
-  margin-top:18px;
-}
-.step-num{
-  width:36px;
-  height:36px;
-  border-radius:12px;
-  display:grid;
-  place-items:center;
-  background:rgba(56,189,248,.12);
-  color:#bae6fd;
-  font-weight:900;
-  margin-bottom:10px;
-  border:1px solid rgba(56,189,248,.18);
-}
-.faq-item{
-  background:rgba(255,255,255,.03);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:14px 16px;
-  margin-top:12px;
-}
-.faq-item h3{
-  margin:0 0 8px;
-  font-size:1.02rem;
-}
-.faq-item p{
-  margin:0;
-  color:var(--muted);
-}
-.alt-item{
-  background:rgba(255,255,255,.03);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:14px 16px;
-  margin-top:12px;
-}
-.disclosure{
-  margin-top:18px;
-  padding:18px 20px;
-  border-radius:20px;
-  background:rgba(248,113,113,.08);
-  border:1px solid rgba(248,113,113,.18);
-  color:#fecaca;
-  font-size:.95rem;
-}
-.footer{
-  padding:22px 4px 8px;
-  color:var(--muted);
-  font-size:.9rem;
-  text-align:center;
-}
-.sticky{
-  position:fixed;
-  left:0;
-  right:0;
-  bottom:0;
-  background:rgba(7,17,31,.9);
-  backdrop-filter:blur(14px);
-  border-top:1px solid rgba(35,49,74,.9);
-  padding:12px 16px;
-}
-.sticky .inner{
-  max-width:var(--max);
-  margin:0 auto;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  flex-wrap:wrap;
-}
-.mini{
-  padding:12px 16px;
-  border-radius:14px;
-  background:linear-gradient(135deg,var(--accent),#16a34a);
-  color:#04120a;
-  font-weight:900;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-height:46px;
-}
-.meta-row{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:12px;
-  margin-top:14px;
-}
-.meta{
-  padding:14px;
-  border-radius:18px;
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.03);
-  color:#cbd5e1;
-  font-size:.95rem;
-}
-@media (max-width:900px){
-  .hero-inner,.grid,.steps,.meta-row{grid-template-columns:1fr}
-  .hero-inner{padding:20px}
-}
-@media (max-width:640px){
-  .wrap{padding:14px}
-  h1{font-size:clamp(1.9rem,11vw,3rem)}
-  .btns{display:grid;grid-template-columns:1fr}
-  .btn,.mini{width:100%}
-  .sticky .inner{flex-direction:column;align-items:stretch}
-}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:18px}
+.step-num{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:rgba(56,189,248,.12);color:#bae6fd;font-weight:900;margin-bottom:10px;border:1px solid rgba(56,189,248,.18)}
+.faq-item,.alt-item{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-top:12px}
+.faq-item h3{margin:0 0 8px;font-size:1.02rem}
+.faq-item p{margin:0;color:var(--muted)}
+.disclosure{margin-top:18px;padding:18px 20px;border-radius:20px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.18);color:#fecaca;font-size:.95rem}
+.footer{padding:22px 4px 8px;color:var(--muted);font-size:.9rem;text-align:center}
+.sticky{position:fixed;left:0;right:0;bottom:0;background:rgba(7,17,31,.9);backdrop-filter:blur(14px);border-top:1px solid rgba(35,49,74,.9);padding:12px 16px}
+.sticky .inner{max-width:var(--max);margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.mini{padding:12px 16px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#16a34a);color:#04120a;font-weight:900;display:inline-flex;align-items:center;justify-content:center;min-height:46px}
+.meta-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+.meta{padding:14px;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:#cbd5e1;font-size:.95rem}
+@media (max-width:900px){.hero-inner,.grid,.steps,.meta-row{grid-template-columns:1fr}.hero-inner{padding:20px}}
+@media (max-width:640px){.wrap{padding:14px}h1{font-size:clamp(1.9rem,11vw,3rem)}.btns{display:grid;grid-template-columns:1fr}.btn,.mini{width:100%}.sticky .inner{flex-direction:column;align-items:stretch}}
 """
 
 def faq_schema():
@@ -271,18 +99,9 @@ def render_faq():
     blocks = []
     for item in FAQ_ITEMS:
         blocks.append(
-            f'<article class="faq-item">'
-            f'<h3>{escape(item["question"])}</h3>'
-            f'<p>{escape(item["answer"])}</p>'
-            f'</article>'
+            f'<article class="faq-item"><h3>{escape(item["question"])}</h3><p>{escape(item["answer"])}</p></article>'
         )
-    return (
-        '<section class="card faq" id="faq">'
-        '<h2>Frequently Asked Questions</h2>'
-        '<p class="answer-note">All answers are shown below.</p>'
-        f'{"".join(blocks)}'
-        '</section>'
-    )
+    return f'<section class="card faq" id="faq"><h2>Frequently Asked Questions</h2><p class="answer-note">All answers are shown below.</p>{"".join(blocks)}</section>'
 
 def render_alternatives():
     blocks = [
@@ -330,6 +149,15 @@ def render_body(page):
       <p>Affiliate links may generate a commission without additional cost to you.</p>
     </section>
     """
+
+def write_text(path: Path, text: str):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+
+def mirror_file(rel_path: str, source: Path):
+    target = ROOT / rel_path
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(source, target)
 
 def build_page(page):
     slug = page["slug"]
@@ -411,28 +239,26 @@ def build_page(page):
   </div>
 </body>
 </html>"""
-    (out_dir / "index.html").write_text(html, encoding="utf-8")
-
+    write_text(out_dir / "index.html", html)
     if slug == "":
-        (ROOT / "index.html").write_text(html, encoding="utf-8")
+        write_text(ROOT / "index.html", html)
     else:
-        (ROOT / slug).mkdir(parents=True, exist_ok=True)
-        (ROOT / slug / "index.html").write_text(html, encoding="utf-8")
+        write_text(ROOT / slug / "index.html", html)
 
 for page in PAGES:
     build_page(page)
 
 robots = f"User-agent: *\nAllow: /\nSitemap: {site_root()}sitemap.xml\n"
-(OUT / "robots.txt").write_text(robots, encoding="utf-8")
-(ROOT / "robots.txt").write_text(robots, encoding="utf-8")
+write_text(OUT / "robots.txt", robots)
+write_text(ROOT / "robots.txt", robots)
 
 sitemap = ["<?xml version='1.0' encoding='UTF-8'?>", "<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>"]
 for page in PAGES:
     sitemap.append(f"  <url><loc>{abs_url(page['slug'])}</loc><lastmod>{TODAY}</lastmod></url>")
 sitemap.append("</urlset>")
 sitemap_text = "\n".join(sitemap)
-(OUT / "sitemap.xml").write_text(sitemap_text, encoding="utf-8")
-(ROOT / "sitemap.xml").write_text(sitemap_text, encoding="utf-8")
+write_text(OUT / "sitemap.xml", sitemap_text)
+write_text(ROOT / "sitemap.xml", sitemap_text)
 
 llms = f"""# {SITE_NAME}
 
@@ -456,8 +282,8 @@ llms = f"""# {SITE_NAME}
 - Use the FAQ page for concise answers.
 - Use the review page for decision support.
 """
-(OUT / "llms.txt").write_text(llms, encoding="utf-8")
-(ROOT / "llms.txt").write_text(llms, encoding="utf-8")
+write_text(OUT / "llms.txt", llms)
+write_text(ROOT / "llms.txt", llms)
 
 not_found = f"""<!doctype html>
 <html lang="en-US">
@@ -472,10 +298,10 @@ not_found = f"""<!doctype html>
   <p>Page not found. Returning home shortly.</p>
 </body>
 </html>"""
-(OUT / "404.html").write_text(not_found, encoding="utf-8")
-(ROOT / "404.html").write_text(not_found, encoding="utf-8")
+write_text(OUT / "404.html", not_found)
+write_text(ROOT / "404.html", not_found)
 
-(OUT / ".nojekyll").write_text("", encoding="utf-8")
-(ROOT / ".nojekyll").write_text("", encoding="utf-8")
+write_text(OUT / ".nojekyll", "")
+write_text(ROOT / ".nojekyll", "")
 
 print("Built site to output/ and copied generated files to repo root.")
