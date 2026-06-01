@@ -4,7 +4,7 @@ from html import escape
 import json
 import re
 
-OUT = Path("output")
+ROOT = Path(".")
 TODAY = date.today().isoformat()
 
 BASE_URL = "https://brightlane.github.io/mondly.com"
@@ -184,9 +184,6 @@ h1{margin:12px 0 14px;font-size:clamp(2rem,5vw,4.25rem);line-height:1.02;letter-
 def site_root():
     return BASE_URL + "/"
 
-def abs_url(slug):
-    return site_root() if slug == "" else f"{site_root()}{slug}/"
-
 def rel_url(slug):
     return "./" if slug == "" else f"./{slug}/"
 
@@ -206,7 +203,8 @@ def related_links(page):
     return links[:8]
 
 def build_pages():
-    pages = [{
+    pages = []
+    pages.append({
         "slug": "",
         "kind": "home",
         "title": HOME["title"],
@@ -215,7 +213,7 @@ def build_pages():
         "hero_badge": HOME["hero_badge"],
         "hero_lead": HOME["hero_lead"],
         "facts": ["Audience: USA visitors", "Format: Affiliate landing page", "Promise: Short daily practice", "Goal: Drive clicks"],
-    }]
+    })
     for hub in HUBS:
         tpl = HUB_TEMPLATES[hub["slug"]]
         pages.append({
@@ -242,23 +240,22 @@ def build_pages():
                     "h1": f"{kw['head_term'].title()} {mod.title()}",
                     "hero_badge": f"{ptype.title()} page • USA visitors",
                     "hero_lead": f"This page targets {kw['head_term']} {mod} and explains how Mondly fits that use case.",
-                    "facts": [f"Language focus: {kw['head_term']}", f"Use case: {mod}", f"Intent family: {ptype}", "Affiliate offer included"],
+                    "facts": [
+                        f"Language focus: {kw['head_term']}",
+                        f"Use case: {mod}",
+                        f"Intent family: {ptype}",
+                        "Affiliate offer included",
+                    ],
                 })
     return pages
 
-def quality_score(page, body_text, links):
-    score = 0
-    score += 30 if page.get("title") else 0
-    score += 20 if page.get("description") else 0
-    score += 20 if len(body_text.split()) >= 120 else 0
-    score += 10 if len(page.get("facts", [])) >= 3 else 0
-    score += 10 if len(links) >= 5 else 0
-    score += 10
-    return score
-
 def render_body(page):
     if page["kind"] == "home":
-        return """
+        faqs = "".join(
+            f'<article class="faq-item"><h3>{escape(item["question"])}</h3><p>{escape(item["answer"])}</p></article>'
+            for item in FAQS
+        )
+        return f"""
         <section class="meta-row" aria-label="Key facts">
           <div class="meta"><strong>Audience</strong><br>USA visitors</div>
           <div class="meta"><strong>Format</strong><br>Affiliate landing page</div>
@@ -274,12 +271,7 @@ def render_body(page):
           <h2>Frequently Asked Questions</h2>
           {faqs}
         </section>
-        """.format(
-            faqs="".join(
-                f'<article class="faq-item"><h3>{escape(item["question"])}</h3><p>{escape(item["answer"])}</p></article>'
-                for item in FAQS[:5]
-            )
-        )
+        """
     if page["kind"] == "hub":
         return """
         <section class="grid" id="details">
@@ -302,21 +294,31 @@ def render_body(page):
     </section>
     """
 
+def quality_score(page, body_text, links):
+    score = 0
+    score += 30 if page.get("title") else 0
+    score += 20 if page.get("description") else 0
+    score += 20 if len(body_text.split()) >= 120 else 0
+    score += 10 if len(page.get("facts", [])) >= 3 else 0
+    score += 10 if len(links) >= 5 else 0
+    score += 10
+    return score
+
 def render_page(page):
-    canonical = abs_url(page["slug"])
+    canonical = f"{site_root()}" if page["slug"] == "" else f"{site_root()}{page['slug']}/"
     body = render_body(page)
     body_text = re.sub(r"<[^>]+>", " ", body)
     links = related_links(page)
     score = quality_score(page, body_text, links)
     indexable = score >= 80
     robots = "index,follow" if indexable else "noindex,nofollow"
-    graph = [
+    schema = [
         {"@type": "Organization", "name": SITE_NAME, "url": site_root(), "logo": BRAND["logo"]},
         {"@type": "WebSite", "name": SITE_NAME, "url": site_root()},
         {"@type": "WebPage", "name": page["title"], "url": canonical, "description": page["description"], "inLanguage": "en-US"},
     ]
     if page["kind"] == "home":
-        graph.append({
+        schema.append({
             "@type": "FAQPage",
             "mainEntity": [
                 {"@type": "Question", "name": item["question"], "acceptedAnswer": {"@type": "Answer", "text": item["answer"]}}
@@ -339,7 +341,7 @@ def render_page(page):
   <meta property="og:description" content="{escape(page["description"])}">
   <meta property="og:url" content="{canonical}">
   <style>{CSS}</style>
-  <script type="application/ld+json">{json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False)}</script>
+  <script type="application/ld+json">{json.dumps({"@context": "https://schema.org", "@graph": schema}, ensure_ascii=False)}</script>
 </head>
 <body>
   <div class="wrap">
@@ -379,19 +381,21 @@ def render_page(page):
 </html>"""
 
 PAGES = build_pages()
+
 for page in PAGES:
-    out_dir = OUT if page["slug"] == "" else OUT / page["slug"]
+    out_dir = ROOT if page["slug"] == "" else ROOT / page["slug"]
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "index.html").write_text(render_page(page), encoding="utf-8")
 
-(OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {site_root()}sitemap.xml\n", encoding="utf-8")
-(OUT / "llms.txt").write_text(f"# {SITE_NAME}\n\nA programmatic affiliate site for USA visitors that explains Mondly and targets long-tail language-learning intent.\n", encoding="utf-8")
-(OUT / "404.html").write_text(f"<!doctype html><html><head><meta charset='utf-8'><meta name='robots' content='noindex,nofollow'><meta http-equiv='refresh' content='5;url={site_root()}'></head><body><p>Page not found.</p></body></html>", encoding="utf-8")
+(ROOT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {site_root()}sitemap.xml\n", encoding="utf-8")
+(ROOT / "llms.txt").write_text(f"# {SITE_NAME}\n\nA programmatic affiliate site for USA visitors that explains Mondly and targets long-tail language-learning intent.\n", encoding="utf-8")
+(ROOT / "404.html").write_text(f"<!doctype html><html><head><meta charset='utf-8'><meta name='robots' content='noindex,nofollow'><meta http-equiv='refresh' content='5;url={site_root()}'></head><body><p>Page not found.</p></body></html>", encoding="utf-8")
 
 sitemap = ["<?xml version='1.0' encoding='UTF-8'?>", "<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>"]
 for page in PAGES:
-    sitemap.append(f"  <url><loc>{abs_url(page['slug'])}</loc><lastmod>{TODAY}</lastmod></url>")
+    loc = site_root() if page["slug"] == "" else f"{site_root()}{page['slug']}/"
+    sitemap.append(f"  <url><loc>{loc}</loc><lastmod>{TODAY}</lastmod></url>")
 sitemap.append("</urlset>")
-(OUT / "sitemap.xml").write_text("\n".join(sitemap), encoding="utf-8")
-(OUT / ".nojekyll").write_text("", encoding="utf-8")
-print(f"Built {len(PAGES)} pages to output/")
+(ROOT / "sitemap.xml").write_text("\n".join(sitemap), encoding="utf-8")
+(ROOT / ".nojekyll").write_text("", encoding="utf-8")
+print(f"Built {len(PAGES)} pages into repo root")
