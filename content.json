@@ -7,100 +7,142 @@
     "official_url": "https://explore.mondly.com/",
     "logo": "https://explore.mondly.com/favicon.ico"
   },
-  "site_summary": "This site helps USA visitors evaluate Mondly, understand its language-learning approach, and click through to the affiliate offer.",
-  "nav": [
-    { "label": "Home", "slug": "" },
-    { "label": "Review", "slug": "review" },
-    { "label": "FAQ", "slug": "faq" },
-    { "label": "Alternatives", "slug": "alternatives" },
-    { "label": "Privacy", "slug": "privacy" },
-    { "label": "Terms", "slug": "terms" }
-  ],
-  "pages": [
-    {
-      "slug": "",
-      "type": "home",
-      "title": "Mondly for USA Visitors | Learn Languages Faster",
-      "description": "Discover Mondly for USA visitors. Learn languages with short lessons, voice recognition, and conversation-style practice built for daily progress.",
-      "h1": "Mondly for USA Visitors Who Want Real Language Progress",
-      "hero_badge": "Short daily lessons • Voice practice • Chat-style learning",
-      "hero_lead": "If you want a language app that feels simple, modern, and easy to keep up with, Mondly is built for that. It focuses on short lessons, speaking practice, and conversation-style repetition that fits into a busy day.",
-      "trust": ["41-language app", "Voice recognition", "Conversation practice", "USA-targeted offer"]
-    },
+  "site_summary": "A programmatic affiliate site for USA visitors that explains Mondly, compares it to alternatives, and targets long-tail language-learning search intent.",
+  "hubs": [
     {
       "slug": "review",
-      "type": "review",
-      "title": "Mondly Review for USA Visitors | Is It Worth It?",
-      "description": "A practical Mondly review covering features, benefits, who it is for, and how the USA offer works.",
-      "h1": "Mondly Review: What USA Visitors Should Know",
-      "hero_badge": "Practical review • USA-focused",
-      "hero_lead": "This page explains what Mondly does well, who it is best for, and what to expect before clicking through to the offer.",
-      "trust": ["Simple review format", "Use-case driven", "Affiliate disclosure included"]
+      "title": "Mondly Review",
+      "description": "A practical review of Mondly for USA visitors."
     },
     {
       "slug": "faq",
-      "type": "faq",
-      "title": "Mondly FAQ | USA Visitors",
-      "description": "Answers to common questions about Mondly, language learning, voice practice, and the USA offer.",
-      "h1": "Mondly FAQ",
-      "hero_badge": "Questions answered clearly",
-      "hero_lead": "Use this page to answer the most common questions users have before they click the offer.",
-      "trust": ["Schema-friendly", "LLM-friendly", "Fast answers"]
+      "title": "Mondly FAQ",
+      "description": "Answers to common Mondly questions."
     },
     {
       "slug": "alternatives",
-      "type": "alternatives",
-      "title": "Mondly Alternatives | USA Language Apps",
-      "description": "Compare Mondly with other language learning apps for USA visitors.",
-      "h1": "Mondly Alternatives",
-      "hero_badge": "Comparison page",
-      "hero_lead": "Some users want a direct comparison before they choose a language app. This page helps them decide faster.",
-      "trust": ["Comparison intent", "Decision support", "SEO expansion"]
+      "title": "Mondly Alternatives",
+      "description": "Other language learning options compared with Mondly."
     },
     {
-      "slug": "privacy",
-      "type": "legal",
-      "title": "Privacy Policy | Mondly USA Offer",
-      "description": "Privacy policy for the Mondly USA Offer affiliate website.",
-      "h1": "Privacy Policy",
-      "hero_badge": "Legal page",
-      "hero_lead": "This page explains basic privacy and affiliate usage on the site."
+      "slug": "compare",
+      "title": "Mondly Comparisons",
+      "description": "Comparison pages for Mondly versus other apps and use cases."
     },
     {
-      "slug": "terms",
-      "type": "legal",
-      "title": "Terms of Use | Mondly USA Offer",
-      "description": "Terms of use for the Mondly USA Offer affiliate website.",
-      "h1": "Terms of Use",
-      "hero_badge": "Legal page",
-      "hero_lead": "This page sets expectations for how the site is used."
+      "slug": "guide",
+      "title": "Language Learning Guides",
+      "description": "Practical language-learning guides and use-case pages."
+    },
+    {
+      "slug": "best",
+      "title": "Best Language Learning Picks",
+      "description": "Best-of pages by scenario, skill level, and learning goal."
     }
   ],
   "faq": [
     {
       "question": "What is Mondly?",
-      "answer": "Mondly is a language learning app built around short lessons, speech practice, and conversation-focused training."
+      "answer": "Mondly is a language learning app focused on short lessons, speech practice, and conversation-style learning."
     },
     {
       "question": "Who is Mondly best for?",
-      "answer": "Mondly is best for beginners, busy adults, and travelers who want practical language learning with a simple daily routine."
+      "answer": "Mondly is a good fit for beginners, busy adults, and travelers who want practical daily language practice."
     },
     {
       "question": "Does Mondly include speaking practice?",
-      "answer": "Yes, Mondly includes speaking practice and voice-focused learning features designed to help users build confidence."
+      "answer": "Yes. Mondly includes voice practice and speaking-focused learning features."
     },
     {
       "question": "How many languages does Mondly support?",
-      "answer": "Mondly is marketed as a 41-language app, which helps it appeal to learners looking for a broad language selection."
+      "answer": "Mondly is marketed as a 41-language app."
     },
     {
-      "question": "Is this page for USA visitors only?",
-      "answer": "Yes, this website is intended for USA visitors and links to the affiliate offer for that audience."
+      "question": "Is this site for USA visitors only?",
+      "answer": "Yes. The affiliate offer and page targeting are intended for USA visitors."
     }
   ],
-  "alternatives": [
-    { "name": "Mondly", "summary": "Best for short daily lessons, speaking practice, and a quick routine." },
-    { "name": "Other language apps", "summary": "Some alternatives focus more on grammar, repetition, or classroom-style study." },
-    { "name": "Best choice", "summary": "If you want a simple speaking-first app, Mondly is a strong option." }
+  "page_templates": {
+    "home": {
+      "title": "Mondly for USA Visitors | Learn Languages Faster",
+      "description": "Discover Mondly for USA visitors. Learn languages with short lessons, voice recognition, and conversation-style practice built for daily progress.",
+      "h1": "Mondly for USA Visitors Who Want Real Language Progress",
+      "hero_badge": "Short daily lessons • Voice practice • Chat-style learning",
+      "hero_lead": "If you want a language app that feels simple, modern, and easy to keep up with, Mondly is built for that. It focuses on short lessons, speaking practice, and conversation-style repetition that fits into a busy day."
+    },
+    "hub": {
+      "review": {
+        "title": "Mondly Review for USA Visitors | Is It Worth It?",
+        "description": "A practical Mondly review covering features, benefits, who it is for, and how the USA offer works.",
+        "h1": "Mondly Review: What USA Visitors Should Know",
+        "hero_badge": "Practical review • USA-focused",
+        "hero_lead": "This page explains what Mondly does well, who it is best for, and what to expect before clicking through to the offer."
+      },
+      "faq": {
+        "title": "Mondly FAQ | USA Visitors",
+        "description": "Answers to common questions about Mondly, language learning, voice practice, and the USA offer.",
+        "h1": "Mondly FAQ",
+        "hero_badge": "Questions answered clearly",
+        "hero_lead": "Use this page to answer the most common questions users have before they click the offer."
+      },
+      "alternatives": {
+        "title": "Mondly Alternatives | USA Language Apps",
+        "description": "Compare Mondly with other language learning apps for USA visitors.",
+        "h1": "Mondly Alternatives",
+        "hero_badge": "Comparison page",
+        "hero_lead": "Some users want a direct comparison before they choose a language app. This page helps them decide faster."
+      },
+      "compare": {
+        "title": "Mondly Comparisons | USA Visitors",
+        "description": "Compare Mondly against other language-learning choices.",
+        "h1": "Mondly Comparisons",
+        "hero_badge": "Decision-support page",
+        "hero_lead": "Comparison pages help visitors choose the right app for their needs."
+      },
+      "guide": {
+        "title": "Language Learning Guides | USA Visitors",
+        "description": "Helpful language-learning guides and usage pages for USA visitors.",
+        "h1": "Language Learning Guides",
+        "hero_badge": "How-to content",
+        "hero_lead": "These pages answer practical questions and help users learn faster."
+      },
+      "best": {
+        "title": "Best Language Learning Picks | USA Visitors",
+        "description": "Best language-learning pages by goal, level, and situation.",
+        "h1": "Best Language Learning Picks",
+        "hero_badge": "Best-of pages",
+        "hero_lead": "These pages target high-intent searches with useful recommendations."
+      }
+    }
+  },
+  "keywords": [
+    {"slug": "learn-spanish", "head_term": "learn Spanish"},
+    {"slug": "learn-french", "head_term": "learn French"},
+    {"slug": "learn-german", "head_term": "learn German"},
+    {"slug": "learn-italian", "head_term": "learn Italian"},
+    {"slug": "learn-portuguese", "head_term": "learn Portuguese"},
+    {"slug": "learn-japanese", "head_term": "learn Japanese"},
+    {"slug": "learn-korean", "head_term": "learn Korean"},
+    {"slug": "learn-chinese", "head_term": "learn Chinese"},
+    {"slug": "learn-arabic", "head_term": "learn Arabic"},
+    {"slug": "learn-russian", "head_term": "learn Russian"}
+  ],
+  "modifiers": [
+    "for beginners",
+    "for adults",
+    "for travelers",
+    "fast",
+    "easily",
+    "at home",
+    "daily",
+    "with speaking practice",
+    "with voice recognition",
+    "for busy people"
+  ],
+  "page_types": [
+    "best",
+    "guide",
+    "compare",
+    "alternatives"
   ]
 }
