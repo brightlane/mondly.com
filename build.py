@@ -3,8 +3,23 @@ from datetime import date
 from html import escape
 import json
 import re
+import sys
 
-DATA = json.loads(Path("content.json").read_text(encoding="utf-8"))
+CONTENT_PATH = Path("content.json")
+OUT = Path("output")
+
+def load_json_file(path: Path):
+    if not path.exists():
+        sys.exit(f"{path} not found")
+    raw = path.read_text(encoding="utf-8").strip()
+    if not raw:
+        sys.exit(f"{path} is empty")
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError as e:
+        sys.exit(f"{path} is invalid JSON: {e}")
+
+DATA = load_json_file(CONTENT_PATH)
 
 BASE_URL = DATA["base_url"].rstrip("/")
 AFF_URL = DATA["affiliate_url"]
@@ -17,10 +32,9 @@ HUB_TEMPLATES = DATA["page_templates"]["hub"]
 PAGE_TYPES = DATA["page_types"]
 KEYWORDS = DATA["keywords"]
 MODIFIERS = DATA["modifiers"]
-
-OUT = Path("output")
-OUT.mkdir(exist_ok=True)
 TODAY = date.today().isoformat()
+
+OUT.mkdir(exist_ok=True)
 
 def site_root():
     return BASE_URL + "/"
@@ -38,6 +52,7 @@ def slugify(text: str):
 
 def build_pages():
     pages = []
+
     pages.append({
         "slug": "",
         "kind": "home",
@@ -77,16 +92,14 @@ def build_pages():
         for kw in KEYWORDS:
             for mod in MODIFIERS:
                 slug = f"{ptype}/{kw['slug']}-{slugify(mod)}"
-                title = f"{kw['head_term'].title()} {mod.title()} | Mondly USA"
-                description = f"Learn about {kw['head_term']} {mod} with Mondly. USA visitors can compare features, benefits, and practical language-learning tips."
                 pages.append({
                     "slug": slug,
                     "kind": "longtail",
                     "page_type": ptype,
                     "keyword": kw["head_term"],
                     "modifier": mod,
-                    "title": title,
-                    "description": description,
+                    "title": f"{kw['head_term'].title()} {mod.title()} | Mondly USA",
+                    "description": f"Learn about {kw['head_term']} {mod} with Mondly. USA visitors can compare features, benefits, and practical language-learning tips.",
                     "h1": f"{kw['head_term'].title()} {mod.title()}",
                     "hero_badge": f"{ptype.title()} page • USA visitors",
                     "hero_lead": f"This page targets {kw['head_term']} {mod} and explains how Mondly fits that use case.",
@@ -101,6 +114,65 @@ def build_pages():
 
 PAGES = build_pages()
 
+CSS = """
+:root{
+  --bg:#07111f; --card:#101a2d; --text:#e5e7eb; --muted:#94a3b8; --line:#23314a;
+  --accent:#22c55e; --shadow:0 24px 70px rgba(0,0,0,.35); --max:1160px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;font-family:Inter,Arial,Helvetica,sans-serif;
+  background:radial-gradient(circle at top left, rgba(56,189,248,.15), transparent 30%),
+             radial-gradient(circle at top right, rgba(34,197,94,.12), transparent 30%),
+             linear-gradient(180deg,#07111f 0%,#08101d 100%);
+  color:var(--text);line-height:1.6;text-rendering:optimizeLegibility;
+}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:var(--max);margin:0 auto;padding:18px}
+.nav{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.nav a{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.03);color:#dbeafe}
+.hero{border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);overflow:hidden;background:linear-gradient(180deg, rgba(16,26,45,.98), rgba(10,18,34,.98))}
+.hero-inner{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;padding:34px;align-items:center}
+h1{margin:12px 0 14px;font-size:clamp(2rem,5vw,4.25rem);line-height:1.02;letter-spacing:-.04em}
+.lead{font-size:1.08rem;color:#cbd5e1;margin:0 0 22px;max-width:62ch}
+.pill{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(34,197,94,.22);background:rgba(34,197,94,.1);color:#bbf7d0;padding:7px 12px;border-radius:999px;font-size:.86rem;font-weight:800}
+.btns{display:flex;gap:12px;flex-wrap:wrap}
+.btn{min-height:52px;padding:14px 20px;border-radius:16px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;border:1px solid transparent}
+.primary{background:linear-gradient(135deg,var(--accent),#16a34a);color:#04120a}
+.secondary{background:rgba(255,255,255,.03);border-color:var(--line)}
+.grid{margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:rgba(16,26,45,.96);border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:0 12px 36px rgba(0,0,0,.16)}
+.card p,.card li{color:var(--muted)}
+.card ul{margin:0;padding-left:18px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:18px}
+.step-num{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:rgba(56,189,248,.12);color:#bae6fd;font-weight:900;margin-bottom:10px;border:1px solid rgba(56,189,248,.18)}
+.faq-item,.page-item{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-top:12px}
+.faq-item h3{margin:0 0 8px;font-size:1.02rem}
+.faq-item p{margin:0;color:var(--muted)}
+.disclosure{margin-top:18px;padding:18px 20px;border-radius:20px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.18);color:#fecaca;font-size:.95rem}
+.footer{padding:22px 4px 8px;color:var(--muted);font-size:.9rem;text-align:center}
+.sticky{position:fixed;left:0;right:0;bottom:0;background:rgba(7,17,31,.9);backdrop-filter:blur(14px);border-top:1px solid rgba(35,49,74,.9);padding:12px 16px}
+.sticky .inner{max-width:var(--max);margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.mini{padding:12px 16px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#16a34a);color:#04120a;font-weight:900;display:inline-flex;align-items:center;justify-content:center;min-height:46px}
+.meta-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+.meta{padding:14px;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:#cbd5e1;font-size:.95rem}
+@media (max-width:900px){.hero-inner,.grid,.steps,.meta-row{grid-template-columns:1fr}.hero-inner{padding:20px}}
+@media (max-width:640px){.wrap{padding:14px}h1{font-size:clamp(1.9rem,11vw,3rem)}.btns{display:grid;grid-template-columns:1fr}.btn,.mini{width:100%}.sticky .inner{flex-direction:column;align-items:stretch}}
+"""
+
+def related_links(page):
+    links = [{"slug": "", "label": "Home"}]
+    for hub in HUBS[:5]:
+        links.append({"slug": hub["slug"], "label": hub["title"]})
+    if page["kind"] == "longtail":
+        links.extend([
+            {"slug": "review", "label": "Mondly Review"},
+            {"slug": "faq", "label": "Mondly FAQ"},
+            {"slug": "alternatives", "label": "Mondly Alternatives"}
+        ])
+    return links[:8]
+
 def quality_score(page, body_text, links):
     score = 0
     score += 30 if page.get("title") else 0
@@ -108,52 +180,12 @@ def quality_score(page, body_text, links):
     score += 20 if len(body_text.split()) >= 220 else 0
     score += 10 if len(page.get("facts", [])) >= 3 else 0
     score += 10 if len(links) >= 5 else 0
-    score += 10 if page.get("canonical_ok", True) else 0
+    score += 10
     return score
 
-def nav_html():
-    return "".join(f'<a href="{rel_url(h["slug"])}">{escape(h["title"])}</a>' for h in HUBS)
-
-def related_links(page, all_pages):
-    picks = []
-    seen = set()
-
-    def add(slug, label):
-        if slug and slug not in seen and slug != page["slug"]:
-            seen.add(slug)
-            picks.append({"slug": slug, "label": label})
-
-    add("", "Home")
-    for h in HUBS[:5]:
-        add(h["slug"], h["title"])
-
-    if page["kind"] == "longtail":
-        add("review", "Mondly Review")
-        add("faq", "Mondly FAQ")
-        add("alternatives", "Mondly Alternatives")
-    elif page["kind"] == "hub":
-        for p in all_pages:
-            if p["kind"] == "longtail" and len(picks) < 8:
-                add(p["slug"], p["title"])
-
-    return picks[:8]
-
-def faq_schema():
-    return {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-            {
-                "@type": "Question",
-                "name": item["question"],
-                "acceptedAnswer": {"@type": "Answer", "text": item["answer"]}
-            } for item in FAQS
-        ]
-    }
-
-def text_block(page):
+def render_body(page):
     if page["kind"] == "home":
-        return f"""
+        return """
         <section class="grid" id="details">
           <article class="card"><h2>What Mondly Does</h2><p>Mondly combines short lessons, speech practice, and conversation-based exercises to help people build vocabulary and confidence one session at a time.</p></article>
           <article class="card"><h2>Why Visitors Click</h2><p>The format is easy to understand: short lessons, voice practice, and a low-friction daily routine.</p></article>
@@ -161,17 +193,16 @@ def text_block(page):
         </section>
         """
     if page["kind"] == "hub":
-        return f"""
+        return """
         <section class="grid" id="details">
           <article class="card"><h2>Why this hub exists</h2><p>This hub organizes related long-tail pages and helps visitors move from a broad question to a specific answer.</p></article>
           <article class="card"><h2>How to use it</h2><p>Link this hub from long-tail pages and use it to surface the most relevant pages in the cluster.</p></article>
           <article class="card"><h2>What makes it useful</h2><p>It creates a clean topic map for crawlers and users.</p></article>
         </section>
         """
-    links = related_links(page, PAGES)
-    facts = "".join(f"<li>{escape(x)}</li>" for x in page["facts"])
-    related = "".join(f'<a class="btn secondary" href="{rel_url(l["slug"])}">{escape(l["label"])}</a>' for l in links)
-    body = f"""
+    facts = "".join(f"<li>{escape(f)}</li>" for f in page["facts"])
+    links = "".join(f'<a class="btn secondary" href="{rel_url(l["slug"])}">{escape(l["label"])}</a>' for l in related_links(page))
+    return f"""
     <section class="grid" id="details">
       <article class="card"><h2>Core angle</h2><p>{escape(page["keyword"])} {escape(page["modifier"])} with Mondly.</p></article>
       <article class="card"><h2>Why it matters</h2><p>This page targets a specific intent and gives users a fast answer that fits a commercial search.</p></article>
@@ -179,36 +210,29 @@ def text_block(page):
     </section>
     <section class="card">
       <h2>Related pages</h2>
-      <div class="btns">{related}</div>
+      <div class="btns">{links}</div>
     </section>
     """
-    return body
 
 def render_page(page):
     canonical = abs_url(page["slug"])
-    if page["kind"] == "home":
-        schema = [
-            {"@type": "Organization", "name": SITE_NAME, "url": site_root(), "logo": BRAND["logo"]},
-            {"@type": "WebSite", "name": SITE_NAME, "url": site_root()},
-            {"@type": "WebPage", "name": page["title"], "url": canonical, "description": page["description"], "inLanguage": "en-US"}
-        ]
-    else:
-        schema = [
-            {"@type": "Organization", "name": SITE_NAME, "url": site_root(), "logo": BRAND["logo"]},
-            {"@type": "WebSite", "name": SITE_NAME, "url": site_root()},
-            {"@type": "WebPage", "name": page["title"], "url": canonical, "description": page["description"], "inLanguage": "en-US"}
-        ]
-        if page["kind"] == "hub":
-            schema.append({"@type": "ItemList", "name": page["title"], "itemListElement": []})
-        if page["kind"] == "longtail" and page.get("page_type") == "guide":
-            schema.append({"@type": "HowTo", "name": page["title"]})
-
-    links = related_links(page, PAGES)
-    body = text_block(page)
+    links = related_links(page)
+    body = render_body(page)
     body_text = re.sub(r"<[^>]+>", " ", body)
     score = quality_score(page, body_text, links)
     indexable = score >= 80
     robots = "index,follow" if indexable else "noindex,nofollow"
+
+    schema_graph = [
+        {"@type": "Organization", "name": SITE_NAME, "url": site_root(), "logo": BRAND["logo"]},
+        {"@type": "WebSite", "name": SITE_NAME, "url": site_root()},
+        {"@type": "WebPage", "name": page["title"], "url": canonical, "description": page["description"], "inLanguage": "en-US"}
+    ]
+
+    if page["kind"] == "hub":
+        schema_graph.append({"@type": "CollectionPage", "name": page["title"], "url": canonical})
+    if page["kind"] == "home":
+        schema_graph.append({"@type": "FAQPage", "mainEntity": [{"@type":"Question","name":f["question"],"acceptedAnswer":{"@type":"Answer","text":f["answer"]}} for f in FAQS]})
 
     return f"""<!doctype html>
 <html lang="en-US">
@@ -228,11 +252,11 @@ def render_page(page):
   <meta property="og:url" content="{canonical}">
   <meta property="og:image" content="{site_root()}assets/mondly-og.jpg">
   <style>{CSS}</style>
-  <script type="application/ld+json">{json.dumps({"@context": "https://schema.org", "@graph": schema if isinstance(schema, list) else [schema]}, ensure_ascii=False)}</script>
+  <script type="application/ld+json">{json.dumps({"@context":"https://schema.org","@graph":schema_graph}, ensure_ascii=False)}</script>
 </head>
 <body>
   <div class="wrap">
-    <nav class="nav">{nav_html()}</nav>
+    <nav class="nav">{''.join(f'<a href="{rel_url(h["slug"])}">{escape(h["title"])}</a>' for h in HUBS)}</nav>
     <main class="hero">
       <div class="hero-inner">
         <section>
@@ -258,7 +282,7 @@ def render_page(page):
     </section>
     <div class="footer">© 2026 • USA-only language learning promo</div>
   </div>
-  <div class="sticky" role="region" aria-label="Sticky call to action">
+  <div class="sticky">
     <div class="inner">
       <div><strong>Ready to try Mondly?</strong><small>Start with the offer below.</small></div>
       <a class="mini" href="{AFF_URL}" rel="sponsored nofollow noopener noreferrer">Start with Mondly</a>
@@ -267,11 +291,10 @@ def render_page(page):
 </body>
 </html>"""
 
-OUT.mkdir(exist_ok=True)
 for page in PAGES:
-    target = OUT if page["slug"] == "" else OUT / page["slug"]
-    target.mkdir(parents=True, exist_ok=True)
-    (target / "index.html").write_text(render_page(page), encoding="utf-8")
+    out_dir = OUT if page["slug"] == "" else OUT / page["slug"]
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "index.html").write_text(render_page(page), encoding="utf-8")
 
 (OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {site_root()}sitemap.xml\n", encoding="utf-8")
 (OUT / "llms.txt").write_text(f"# {SITE_NAME}\n\n{DATA['site_summary']}\n", encoding="utf-8")
