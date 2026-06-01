@@ -203,8 +203,7 @@ def related_links(page):
     return links[:8]
 
 def build_pages():
-    pages = []
-    pages.append({
+    pages = [{
         "slug": "",
         "kind": "home",
         "title": HOME["title"],
@@ -213,7 +212,7 @@ def build_pages():
         "hero_badge": HOME["hero_badge"],
         "hero_lead": HOME["hero_lead"],
         "facts": ["Audience: USA visitors", "Format: Affiliate landing page", "Promise: Short daily practice", "Goal: Drive clicks"],
-    })
+    }]
     for hub in HUBS:
         tpl = HUB_TEMPLATES[hub["slug"]]
         pages.append({
