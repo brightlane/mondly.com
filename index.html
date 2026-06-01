@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer-when-downgrade">
+  <title>Mondly for USA Visitors | Learn Languages Faster</title>
+  <meta name="description" content="Discover Mondly for USA visitors. Learn languages with short lessons, voice recognition, and conversation-style practice built for daily progress.">
+  <meta name="keywords" content="Mondly, language learning app, learn languages, voice recognition, chatbot learning, daily language practice, USA offer">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <meta name="theme-color" content="#08111f">
+  <link rel="canonical" href="https://brightlane.github.io/mondly.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:site_name" content="Mondly USA Offer">
+  <meta property="og:title" content="Mondly for USA Visitors | Learn Languages Faster">
+  <meta property="og:description" content="Short lessons, voice recognition, and conversation-style practice for daily language learning.">
+  <meta property="og:url" content="https://brightlane.github.io/mondly.com/">
+  <meta property="og:image" content="https://brightlane.github.io/mondly.com/assets/mondly-og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Mondly for USA Visitors | Learn Languages Faster">
+  <meta name="twitter:description" content="Short lessons, voice recognition, and conversation-style practice for daily language learning.">
+  <meta name="twitter:image" content="https://brightlane.github.io/mondly.com/assets/mondly-og.jpg">
+  <style>
+    :root{
+      --bg:#050b16;
+      --panel:#0c1626;
+      --panel2:#101c31;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --line:#23324a;
+      --green:#22c55e;
+      --blue:#38bdf8;
+      --gold:#f59e0b;
+      --shadow:0 28px 70px rgba(0,0,0,.42);
+      --max:1180px;
+      --radius:24px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter,Arial,Helvetica,sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(56,189,248,.15), transparent 28%),
+        radial-gradient(circle at top right, rgba(34,197,94,.10), transparent 30%),
+        linear-gradient(180deg, #050b16 0%, #091120 100%);
+      color:var(--text);
+      line-height:1.6;
+    }
+    a{color:inherit;text-decoration:none}
+    .wrap{max-width:var(--max);margin:0 auto;padding:20px}
+    .topline{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      color:var(--muted);
+      font-size:.92rem;
+      margin-bottom:14px;
+    }
+    .nav{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+    .nav a{
+      padding:8px 12px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:rgba(255,255,255,.03);
+      color:#dbeafe;
+    }
+    .hero{
+      border:1px solid var(--line);
+      border-radius:32px;
+      overflow:hidden;
+      background:
+        linear-gradient(180deg, rgba(16,28,49,.98), rgba(8,16,30,.98));
+      box-shadow:var(--shadow);
+    }
+    .hero-inner{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:24px;
+      padding:36px;
+      align-items:center;
+    }
+    .eyebrow{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding:7px 12px;
+      border-radius:999px;
+      border:1px solid rgba(34,197,94,.24);
+      background:rgba(34,197,94,.1);
+      color:#bbf7d0;
+      font-size:.88rem;
+      font-weight:800;
+    }
+    h1{
+      margin:12px 0 14px;
+      font-size:clamp(2.1rem, 5vw, 4.4rem);
+      line-height:1.02;
+      letter-spacing:-.04em;
+    }
+    .lead{
+      max-width:62ch;
+      margin:0 0 22px;
+      font-size:1.08rem;
+      color:#cbd5e1;
+    }
+    .cta-row{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin:20px 0 14px;
+    }
+    .btn{
+      min-height:52px;
+      padding:14px 20px;
+      border-radius:16px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      border:1px solid transparent;
+      transition:transform .15s ease, filter .15s ease;
+    }
+    .btn:hover{transform:translateY(-1px);filter:brightness(1.04)}
+    .btn-primary{
+      background:linear-gradient(135deg, var(--green), #16a34a);
+      color:#04120a;
+      box-shadow:0 14px 30px rgba(34,197,94,.16);
+    }
+    .btn-secondary{
+      background:rgba(255,255,255,.03);
+      border-color:var(--line);
+      color:var(--text);
+    }
+    .proof{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:18px;
+      color:#dbeafe;
+      font-size:.92rem;
+    }
+    .proof span{
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+    }
+    .mock{
+      border:1px solid var(--line);
+      border-radius:28px;
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      padding:20px;
+    }
+    .screen{
+      min-height:330px;
+      border:1px solid #28405f;
+      border-radius:22px;
+      padding:18px;
+      background:linear-gradient(180deg, #0d1728 0%, #09101c 100%);
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
+    .screen-top{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      font-size:.9rem;
+      color:#cbd5e1;
+    }
+    .dots{display:flex;gap:6px}
+    .dots i{width:10px;height:10px;border-radius:999px;display:block}
+    .dots i:nth-child(1){background:var(--blue)}
+    .dots i:nth-child(2){background:var(--green)}
+    .dots i:nth-child(3){background:var(--gold)}
+    .card-grid{
+      margin-top:22px;
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:18px;
+    }
+    .card{
+      background:rgba(16,28,49,.96);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:22px;
+      box-shadow:0 12px 36px rgba(0,0,0,.16);
+    }
+    .card h2,.card h3{margin:0 0 10px;line-height:1.15}
+    .card p,.card li{color:var(--muted)}
+    .card ul{margin:0;padding-left:18px}
+    .section-title{
+      margin:28px 0 14px;
+      font-size:1.45rem;
+      letter-spacing:-.02em;
+    }
+    .feature-list{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:12px;
+      margin-top:14px;
+    }
+    .feature{
+      padding:14px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:#cbd5e1;
+      font-size:.95rem;
+    }
+    .steps{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:18px;
+      margin-top:18px;
+    }
+    .step-num{
+      width:36px;
+      height:36px;
+      border-radius:12px;
+      display:grid;
+      place-items:center;
+      background:rgba(56,189,248,.12);
+      color:#bae6fd;
+      font-weight:900;
+      margin-bottom:10px;
+      border:1px solid rgba(56,189,248,.18);
+    }
+    .faq details{
+      margin-top:12px;
+      padding:14px 16px;
+      border-radius:16px;
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+    }
+    .faq summary{
+      cursor:pointer;
+      font-weight:800;
+      color:#fff;
+    }
+    .faq p{margin:10px 0 0}
+    .disclosure{
+      margin-top:18px;
+      padding:18px 20px;
+      border-radius:20px;
+      background:rgba(248,113,113,.08);
+      border:1px solid rgba(248,113,113,.18);
+      color:#fecaca;
+      font-size:.95rem;
+    }
+    .footer{
+      padding:22px 4px 8px;
+      color:var(--muted);
+      font-size:.9rem;
+      text-align:center;
+    }
+    .sticky{
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      background:rgba(5,11,22,.9);
+      backdrop-filter:blur(14px);
+      border-top:1px solid rgba(35,50,74,.9);
+      padding:12px 16px;
+      z-index:20;
+    }
+    .sticky-inner{
+      max-width:var(--max);
+      margin:0 auto;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .mini-btn{
+      min-height:46px;
+      padding:12px 16px;
+      border-radius:14px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      background:linear-gradient(135deg, var(--green), #16a34a);
+      color:#04120a;
+    }
+    @media (max-width: 920px){
+      .hero-inner,.card-grid,.steps,.feature-list{grid-template-columns:1fr}
+      .mock{order:-1}
+      .hero-inner{padding:22px}
+    }
+    @media (max-width: 640px){
+      .wrap{padding:14px}
+      h1{font-size:clamp(1.9rem, 10vw, 3rem)}
+      .cta-row{display:grid;grid-template-columns:1fr}
+      .btn,.mini-btn{width:100%}
+      .sticky-inner{flex-direction:column;align-items:stretch}
+    }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "name": "Mondly",
+        "url": "https://explore.mondly.com/",
+        "logo": "https://explore.mondly.com/favicon.ico"
+      },
+      {
+        "@type": "WebSite",
+        "name": "Mondly USA Offer",
+        "url": "https://brightlane.github.io/mondly.com/"
+      },
+      {
+        "@type": "WebPage",
+        "name": "Mondly for USA Visitors | Learn Languages Faster",
+        "url": "https://brightlane.github.io/mondly.com/",
+        "description": "Discover Mondly for USA visitors. Learn languages with short lessons, voice recognition, and conversation-style practice built for daily progress.",
+        "inLanguage": "en-US",
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "Mondly USA Offer",
+          "url": "https://brightlane.github.io/mondly.com/"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is Mondly?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Mondly is a language learning app built around short lessons, speech practice, and conversation-focused training."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Who is Mondly best for?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Mondly is best for beginners, busy adults, and travelers who want practical language learning with a simple daily routine."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does Mondly include speaking practice?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, Mondly includes speaking practice and voice-focused learning features designed to help users build confidence."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topline">
+      <div>USA visitors only</div>
+      <div>Affiliate disclosure below</div>
+    </div>
+
+    <nav class="nav" aria-label="Main navigation">
+      <a href="#why">Why Mondly</a>
+      <a href="#features">Features</a>
+      <a href="#steps">How it works</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+
+    <main class="hero">
+      <div class="hero-inner">
+        <section>
+          <span class="eyebrow">Short daily lessons • Voice practice • Chat-style learning</span>
+          <h1>Mondly for USA Visitors Who Want Real Language Progress</h1>
+          <p class="lead">
+            If you want a language app that feels simple, modern, and easy to keep up with, Mondly is built for that.
+            It focuses on short lessons, speaking practice, and conversation-style repetition that fits into a busy day.
+          </p>
+
+          <div class="cta-row">
+            <a class="btn btn-primary" href="https://convert.ctypy.com/aff_c?offer_id=29588&aff_id=21885" rel="sponsored nofollow noopener noreferrer">Start with Mondly</a>
+            <a class="btn btn-secondary" href="#features">See what you get</a>
+          </div>
+
+          <div class="proof" aria-label="Trust signals">
+            <span>41-language app</span>
+            <span>Voice recognition</span>
+            <span>Conversation practice</span>
+            <span>USA-targeted offer</span>
+          </div>
+        </section>
+
+        <aside class="mock" aria-label="Learning preview">
+          <div class="screen">
+            <div class="screen-top">
+              <strong>Learning flow preview</strong>
+              <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+            </div>
+            <div class="card" style="margin:0;background:rgba(255,255,255,.03);">
+              <h3>Daily session</h3>
+              <p>Pick a lesson, repeat phrases, speak aloud, and review key words in minutes.</p>
+            </div>
+            <div class="card" style="margin:0;background:rgba(255,255,255,.03);">
+              <h3>Why it works</h3>
+              <p>Short, repeatable practice is easier to maintain than long, overwhelming study sessions.</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <section id="why">
+      <h2 class="section-title">Why Mondly stands out</h2>
+      <div class="card-grid">
+        <article class="card">
+          <h3>Fast to start</h3>
+          <p>You do not need a big setup or long session to begin. The app is built around short, repeatable lessons.</p>
+        </article>
+        <article class="card">
+          <h3>Speaking-first</h3>
+          <p>Voice practice and conversation-style exercises help you get comfortable hearing and saying the language out loud.</p>
+        </article>
+        <article class="card">
+          <h3>Easy to keep using</h3>
+          <p>Because sessions are small, it is easier to make language learning a habit instead of a chore.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="features">
+      <h2 class="section-title">What you get</h2>
+      <div class="feature-list">
+        <div class="feature">Short daily lessons</div>
+        <div class="feature">Voice recognition</div>
+        <div class="feature">Conversation-style practice</div>
+        <div class="feature">Mobile-friendly learning</div>
+      </div>
+    </section>
+
+    <section id="steps">
+      <h2 class="section-title">How it works</h2>
+      <div class="steps">
+        <article class="card">
+          <div class="step-num">1</div>
+          <h3>Choose a language</h3>
+          <p>Start with the language you want and begin with the first lesson.</p>
+        </article>
+        <article class="card">
+          <div class="step-num">2</div>
+          <h3>Practice daily</h3>
+          <p>Do a small session each day so the habit stays easy to maintain.</p>
+        </article>
+        <article class="card">
+          <div class="step-num">3</div>
+          <h3>Build confidence</h3>
+          <p>Use speaking practice and repetition to make progress feel natural.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="faq" class="faq">
+      <h2 class="section-title">Frequently asked questions</h2>
+      <details>
+        <summary>What is Mondly?</summary>
+        <p>Mondly is a language learning app focused on short lessons, speaking practice, and conversation-style learning.</p>
+      </details>
+      <details>
+        <summary>Who is this page for?</summary>
+        <p>This page is written for USA visitors who want a clear, mobile-friendly way to learn languages.</p>
+      </details>
+      <details>
+        <summary>Does Mondly support voice practice?</summary>
+        <p>Yes. Mondly includes voice recognition and speaking-focused features that help users practice out loud.</p>
+      </details>
+      <details>
+        <summary>Is this an affiliate page?</summary>
+        <p>Yes. Clicking the main button may earn a commission at no extra cost to you.</p>
+      </details>
+    </section>
+
+    <section class="disclosure">
+      <strong>Affiliate disclosure:</strong> This page contains affiliate links. If you click and make a purchase, I may earn a commission at no extra cost to you.
+    </section>
+
+    <div class="footer">
+      © 2026 • Mondly USA Offer
+    </div>
+  </div>
+
+  <div class="sticky" role="region" aria-label="Sticky call to action">
+    <div class="sticky-inner">
+      <div>
+        <strong>Ready to try Mondly?</strong>
+        <small>Start with the USA offer using the button on the right.</small>
+      </div>
+      <a class="mini-btn" href="https://convert.ctypy.com/aff_c?offer_id=29588&aff_id=21885" rel="sponsored nofollow noopener noreferrer">Start with Mondly</a>
+    </div>
+  </div>
+</body>
+</html>
