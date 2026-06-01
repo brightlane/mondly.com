@@ -145,9 +145,7 @@ def load_data():
         return DEFAULT_DATA
     try:
         data = json.loads(raw)
-        if not isinstance(data, dict):
-            return DEFAULT_DATA
-        return data
+        return data if isinstance(data, dict) else DEFAULT_DATA
     except json.JSONDecodeError:
         return DEFAULT_DATA
 
@@ -258,12 +256,7 @@ def build_pages():
         "h1": HOME["h1"],
         "hero_badge": HOME["hero_badge"],
         "hero_lead": HOME["hero_lead"],
-        "facts": [
-            "Audience: USA visitors",
-            "Format: Affiliate landing page",
-            "Promise: Short daily practice",
-            "Goal: Drive clicks"
-        ]
+        "facts": ["Audience: USA visitors", "Format: Affiliate landing page", "Promise: Short daily practice", "Goal: Drive clicks"]
     })
     for hub in HUBS:
         tpl = HUB_TEMPLATES[hub["slug"]]
@@ -275,12 +268,7 @@ def build_pages():
             "h1": tpl["h1"],
             "hero_badge": tpl["hero_badge"],
             "hero_lead": tpl["hero_lead"],
-            "facts": [
-                "Focused topic hub",
-                "Links to long-tail pages",
-                "Built for internal navigation",
-                "Targets a distinct intent"
-            ]
+            "facts": ["Focused topic hub", "Links to long-tail pages", "Built for internal navigation", "Targets a distinct intent"]
         })
     for ptype in PAGE_TYPES:
         for kw in KEYWORDS:
