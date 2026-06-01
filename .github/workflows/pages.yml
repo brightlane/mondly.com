@@ -20,12 +20,27 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: python build.py
-      - uses: actions/upload-pages-artifact@v3
+
+      - name: Build site
+        run: python build.py
+
+      - name: Verify output
+        run: |
+          test -f output/index.html
+          test -f output/404.html
+          test -f output/robots.txt
+          test -f output/sitemap.xml
+          test -f output/llms.txt
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./output
 
