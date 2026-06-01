@@ -1,8 +1,9 @@
 from pathlib import Path
 from datetime import date
+from html import escape
 import json
 import shutil
-from html import escape
+import itertools
 
 DATA = json.loads(Path("content.json").read_text(encoding="utf-8"))
 
@@ -10,10 +11,13 @@ BASE_URL = DATA["base_url"].rstrip("/")
 AFF_URL = DATA["affiliate_url"]
 SITE_NAME = DATA["site_name"]
 BRAND = DATA["brand"]
-PAGES = DATA["pages"]
-FAQ_ITEMS = DATA["faq"]
-ALT_ITEMS = DATA["alternatives"]
-NAV = DATA["nav"]
+HOME = DATA["page_templates"]["home"]
+HUBS = DATA["hubs"]
+FAQS = DATA["faq"]
+KEYWORDS = DATA["keywords"]
+MODIFIERS = DATA["modifiers"]
+PAGE_TYPES = DATA["page_types"]
+HUB_TEMPLATES = DATA["page_templates"]["hub"]
 
 ROOT = Path(".")
 OUT = Path("output")
@@ -29,11 +33,47 @@ def abs_url(slug: str) -> str:
 def rel_url(slug: str) -> str:
     return "./" if slug == "" else f"./{slug}/"
 
-def nav_html():
-    return "".join(
-        f'<a href="{rel_url(item["slug"])}">{escape(item["label"])}</a>'
-        for item in NAV
-    )
+def slugify(text: str) -> str:
+    return text.lower().replace("&", "and").replace("/", "-").replace(" ", "-").replace("--", "-")
+
+def build_page_list():
+    pages = []
+    pages.append({"slug": "", "type": "home", **HOME})
+    for hub in HUBS:
+        pages.append({
+            "slug": hub["slug"],
+            "type": hub["slug"],
+            "title": HUB_TEMPLATES[hub["slug"]]["title"],
+            "description": HUB_TEMPLATES[hub["slug"]]["description"],
+            "h1": HUB_TEMPLATES[hub["slug"]]["h1"],
+            "hero_badge": HUB_TEMPLATES[hub["slug"]]["hero_badge"],
+            "hero_lead": HUB_TEMPLATES[hub["slug"]]["hero_lead"]
+        })
+    count = 0
+    for kw in KEYWORDS:
+        for mod in MODIFIERS:
+            for ptype in PAGE_TYPES:
+                if count >= 1000:
+                    return pages
+                slug = f"{ptype}/{kw['slug']}-{slugify(mod)}"
+                title = f"{kw['head_term'].title()} {mod.title()} | Mondly USA"
+                desc = f"Learn about {kw['head_term']} {mod} with Mondly. USA visitors can compare features, benefits, and practical language-learning tips."
+                h1 = f"{kw['head_term'].title()} {mod.title()}"
+                pages.append({
+                    "slug": slug,
+                    "type": ptype,
+                    "keyword": kw["head_term"],
+                    "modifier": mod,
+                    "title": title,
+                    "description": desc,
+                    "h1": h1,
+                    "hero_badge": f"{ptype.title()} page • USA visitors",
+                    "hero_lead": f"This page targets {kw['head_term']} {mod} and explains how Mondly fits that use case."
+                })
+                count += 1
+    return pages
+
+PAGES = build_page_list()
 
 CSS = """
 :root{
@@ -68,7 +108,7 @@ h1{margin:12px 0 14px;font-size:clamp(2rem,5vw,4.25rem);line-height:1.02;letter-
 .card ul{margin:0;padding-left:18px}
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:18px}
 .step-num{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:rgba(56,189,248,.12);color:#bae6fd;font-weight:900;margin-bottom:10px;border:1px solid rgba(56,189,248,.18)}
-.faq-item,.alt-item{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-top:12px}
+.faq-item,.alt-item,.page-item{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-top:12px}
 .faq-item h3{margin:0 0 8px;font-size:1.02rem}
 .faq-item p{margin:0;color:var(--muted)}
 .disclosure{margin-top:18px;padding:18px 20px;border-radius:20px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.18);color:#fecaca;font-size:.95rem}
@@ -89,26 +129,26 @@ def faq_schema():
             {
                 "@type": "Question",
                 "name": item["question"],
-                "acceptedAnswer": {"@type": "Answer", "text": item["answer"]},
-            }
-            for item in FAQ_ITEMS
-        ],
+                "acceptedAnswer": {"@type": "Answer", "text": item["answer"]}
+            } for item in FAQS
+        ]
     }
+
+def nav_html():
+    items = [('<a href="./">Home</a>')] + [f'<a href="./{hub["slug"]}/">{hub["slug"].title()}</a>' for hub in HUBS]
+    return "".join(items)
 
 def render_faq():
     blocks = []
-    for item in FAQ_ITEMS:
-        blocks.append(
-            f'<article class="faq-item"><h3>{escape(item["question"])}</h3><p>{escape(item["answer"])}</p></article>'
-        )
-    return f'<section class="card faq" id="faq"><h2>Frequently Asked Questions</h2><p class="answer-note">All answers are shown below.</p>{"".join(blocks)}</section>'
+    for item in FAQS:
+        blocks.append(f'<article class="faq-item"><h3>{escape(item["question"])}</h3><p>{escape(item["answer"])}</p></article>')
+    return f'<section class="card" id="faq"><h2>Frequently Asked Questions</h2>{"".join(blocks)}</section>'
 
-def render_alternatives():
-    blocks = [
-        f'<div class="alt-item"><strong>{escape(item["name"])}</strong><p>{escape(item["summary"])}</p></div>'
-        for item in ALT_ITEMS
-    ]
-    return f'<section class="card" id="details"><h2>Mondly Alternatives</h2>{"".join(blocks)}</section>'
+def render_list_page(title, items):
+    blocks = []
+    for item in items[:24]:
+        blocks.append(f'<article class="page-item"><strong>{escape(item.get("title", item.get("name", "Page")))}</strong><p>{escape(item.get("description", item.get("summary", "")))}</p></article>')
+    return f'<section class="card" id="details"><h2>{escape(title)}</h2>{"".join(blocks)}</section>'
 
 def render_body(page):
     if page["type"] == "home":
@@ -124,40 +164,25 @@ def render_body(page):
           <article class="card"><h2>Why Visitors Click</h2><p>The format is easy to understand: short lessons, voice practice, and a low-friction daily routine.</p></article>
           <article class="card"><h2>What You Get</h2><ul><li>Short daily lessons.</li><li>Speaking and voice practice.</li><li>Conversation-style learning.</li><li>Simple mobile-friendly flow.</li></ul></article>
         </section>
-        <section class="steps" id="how" aria-label="How it works">
-          <article class="card"><div class="step-num">1</div><h3>Choose your language</h3><p>Pick the language you want to learn and start with a manageable daily routine.</p></article>
-          <article class="card"><div class="step-num">2</div><h3>Practice speaking</h3><p>Use conversation-style exercises and voice practice to build confidence.</p></article>
-          <article class="card"><div class="step-num">3</div><h3>Keep the streak going</h3><p>Short sessions make it easier to return every day and keep progress moving.</p></article>
+        <section class="steps" aria-label="How it works">
+          <article class="card"><div class="step-num">1</div><h3>Choose a topic</h3><p>Select a language, use case, or comparison page.</p></article>
+          <article class="card"><div class="step-num">2</div><h3>Read the guide</h3><p>Each page gives a focused answer for one search intent.</p></article>
+          <article class="card"><div class="step-num">3</div><h3>Click the offer</h3><p>The CTA always leads to the Mondly affiliate offer.</p></article>
         </section>
         {render_faq()}
         """
-    if page["type"] == "review":
-        return """
-        <section class="grid" id="details">
-          <article class="card"><h2>Quick verdict</h2><p>Mondly is a strong fit if you want short sessions, speech practice, and a simple app-based language routine.</p></article>
-          <article class="card"><h2>Best for</h2><p>Beginners, casual learners, travelers, and busy adults who need a lightweight daily learning habit.</p></article>
-          <article class="card"><h2>Watch out for</h2><p>As with most language apps, results depend on consistency. Short daily use matters more than occasional long sessions.</p></article>
-        </section>
-        """
-    if page["type"] == "faq":
-        return render_faq()
-    if page["type"] == "alternatives":
-        return render_alternatives()
-    return """
+    if page["type"] in PAGE_TYPES:
+        return render_list_page(page["h1"], PAGES)
+    return f"""
     <section class="card">
       <p>This page is provided for informational and promotional purposes only.</p>
       <p>Affiliate links may generate a commission without additional cost to you.</p>
     </section>
     """
 
-def write_text(path: Path, text: str):
+def write(path: Path, text: str):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8")
-
-def mirror_file(rel_path: str, source: Path):
-    target = ROOT / rel_path
-    target.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(source, target)
 
 def build_page(page):
     slug = page["slug"]
@@ -168,9 +193,9 @@ def build_page(page):
     schema = [
         {"@type": "Organization", "name": SITE_NAME, "url": site_root(), "logo": BRAND["logo"]},
         {"@type": "WebSite", "name": SITE_NAME, "url": site_root()},
-        {"@type": "WebPage", "name": page["title"], "url": canonical, "description": page["description"], "inLanguage": "en-US"},
+        {"@type": "WebPage", "name": page["title"], "url": canonical, "description": page["description"], "inLanguage": "en-US"}
     ]
-    if page["type"] in ("home", "faq"):
+    if page["type"] == "faq":
         schema.append(faq_schema())
 
     html = f"""<!doctype html>
@@ -210,9 +235,6 @@ def build_page(page):
             <a class="btn primary" href="{AFF_URL}" rel="sponsored nofollow noopener noreferrer">Start with Mondly</a>
             <a class="btn secondary" href="#details">Explore the page</a>
           </div>
-          <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;color:#dbeafe;font-size:.92rem">
-            {''.join(f'<span style="padding:8px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04)">{escape(t)}</span>' for t in page.get("trust", []))}
-          </div>
         </section>
         <aside class="card">
           <h2>Fast facts</h2>
@@ -231,77 +253,24 @@ def build_page(page):
     </section>
     <div class="footer">© 2026 • USA-only language learning promo</div>
   </div>
-  <div class="sticky" role="region" aria-label="Sticky call to action">
-    <div class="inner">
-      <div><strong>Ready to try Mondly?</strong><small>Start with the offer below.</small></div>
-      <a class="mini" href="{AFF_URL}" rel="sponsored nofollow noopener noreferrer">Start with Mondly</a>
-    </div>
-  </div>
+  <div class="sticky"><div class="inner"><div><strong>Ready to try Mondly?</strong><small>Start with the offer below.</small></div><a class="mini" href="{AFF_URL}" rel="sponsored nofollow noopener noreferrer">Start with Mondly</a></div></div>
 </body>
 </html>"""
-    write_text(out_dir / "index.html", html)
-    if slug == "":
-        write_text(ROOT / "index.html", html)
-    else:
-        write_text(ROOT / slug / "index.html", html)
+    write(out_dir / "index.html", html)
 
 for page in PAGES:
     build_page(page)
 
 robots = f"User-agent: *\nAllow: /\nSitemap: {site_root()}sitemap.xml\n"
-write_text(OUT / "robots.txt", robots)
-write_text(ROOT / "robots.txt", robots)
+write(OUT / "robots.txt", robots)
+write(OUT / "llms.txt", f"# {SITE_NAME}\n\n{DATA['site_summary']}\n")
+write(OUT / "404.html", f"<!doctype html><html><head><meta charset='utf-8'><meta name='robots' content='noindex,nofollow'><meta http-equiv='refresh' content='5;url={site_root()}'></head><body><p>Page not found.</p></body></html>")
 
 sitemap = ["<?xml version='1.0' encoding='UTF-8'?>", "<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>"]
 for page in PAGES:
     sitemap.append(f"  <url><loc>{abs_url(page['slug'])}</loc><lastmod>{TODAY}</lastmod></url>")
 sitemap.append("</urlset>")
-sitemap_text = "\n".join(sitemap)
-write_text(OUT / "sitemap.xml", sitemap_text)
-write_text(ROOT / "sitemap.xml", sitemap_text)
+write(OUT / "sitemap.xml", "\n".join(sitemap))
 
-llms = f"""# {SITE_NAME}
-
-{DATA["site_summary"]}
-
-## Key pages
-- [Home]({abs_url("")})
-- [Review]({abs_url("review")})
-- [FAQ]({abs_url("faq")})
-- [Alternatives]({abs_url("alternatives")})
-- [Privacy]({abs_url("privacy")})
-- [Terms]({abs_url("terms")})
-
-## Brand
-- Name: {BRAND["name"]}
-- Official site: {BRAND["official_url"]}
-
-## Guidance
-- This site is written for USA visitors.
-- The main action is the affiliate link to Mondly.
-- Use the FAQ page for concise answers.
-- Use the review page for decision support.
-"""
-write_text(OUT / "llms.txt", llms)
-write_text(ROOT / "llms.txt", llms)
-
-not_found = f"""<!doctype html>
-<html lang="en-US">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Page Not Found | {SITE_NAME}</title>
-  <meta name="robots" content="noindex,nofollow">
-  <meta http-equiv="refresh" content="5;url={site_root()}">
-</head>
-<body>
-  <p>Page not found. Returning home shortly.</p>
-</body>
-</html>"""
-write_text(OUT / "404.html", not_found)
-write_text(ROOT / "404.html", not_found)
-
-write_text(OUT / ".nojekyll", "")
-write_text(ROOT / ".nojekyll", "")
-
-print("Built site to output/ and copied generated files to repo root.")
+write(OUT / ".nojekyll", "")
+print(f"Built {len(PAGES)} pages to output/")
