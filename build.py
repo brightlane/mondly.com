@@ -346,7 +346,7 @@ def render_page(page):
         {"@type": "WebPage", "name": page["title"], "url": canonical, "description": page["description"], "inLanguage": "en-US"}
     ]
     if page["kind"] == "home":
-        schema.append({"@type": "FAQPage", "mainEntity": [{"@type":"Question","name":f["question"],"acceptedAnswer":{"@type":"Answer","text":f["answer"]}} for f in FAQS]})
+        schema.append({"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": f["question"], "acceptedAnswer": {"@type": "Answer", "text": f["answer"]}} for f in FAQS]})
     return f"""<!doctype html>
 <html lang="en-US">
 <head>
@@ -357,7 +357,7 @@ def render_page(page):
   <meta name="robots" content="{robots},max-image-preview:large,max-snippet:-1,max-video-preview:-1">
   <link rel="canonical" href="{canonical}">
   <style>{CSS}</style>
-  <script type="application/ld+json">{json.dumps({"@context":"https://schema.org","@graph":schema}, ensure_ascii=False)}</script>
+  <script type="application/ld+json">{json.dumps({"@context": "https://schema.org", "@graph": schema}, ensure_ascii=False)}</script>
 </head>
 <body>
   <div class="wrap">
