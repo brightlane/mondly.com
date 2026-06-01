@@ -6,6 +6,7 @@ from html import escape
 DATA = json.loads(Path("content.json").read_text(encoding="utf-8"))
 
 BASE_URL = DATA["base_url"].rstrip("/")
+BASE_PATH = "/" + BASE_URL.rstrip("/").split("/", 3)[-1] if "github.io" in BASE_URL else ""
 AFF_URL = DATA["affiliate_url"]
 SITE_NAME = DATA["site_name"]
 BRAND = DATA["brand"]
@@ -17,6 +18,21 @@ NAV = DATA["nav"]
 OUT = Path("output")
 OUT.mkdir(exist_ok=True)
 TODAY = date.today().isoformat()
+
+def site_root():
+    return BASE_URL + "/"
+
+def abs_url(slug: str) -> str:
+    return site_root() if slug == "" else f"{site_root()}{slug}/"
+
+def rel_url(slug: str) -> str:
+    return "./" if slug == "" else f"./{slug}/"
+
+def nav_html():
+    return "".join(
+        f'<a href="{rel_url(item["slug"])}">{escape(item["label"])}</a>'
+        for item in NAV
+    )
 
 CSS = """
 :root{
@@ -228,15 +244,6 @@ h1{
 }
 """
 
-def abs_url(slug: str) -> str:
-    return f"{BASE_URL}/" if slug == "" else f"{BASE_URL}/{slug}/"
-
-def nav_html():
-    return "".join(
-        f'<a href="{abs_url(item["slug"])[len(BASE_URL):]}">{escape(item["label"])}</a>'
-        for item in NAV
-    )
-
 def faq_schema():
     return {
         "@type": "FAQPage",
@@ -263,7 +270,7 @@ def render_alternatives():
     ]
     return f'<section class="card" id="details"><h2>Mondly Alternatives</h2>{"".join(blocks)}</section>'
 
-def render_page_body(page):
+def render_body(page):
     if page["type"] == "home":
         return f"""
         <section class="meta-row" aria-label="Key facts">
@@ -307,15 +314,15 @@ def build_page(page):
     slug = page["slug"]
     out_dir = OUT if slug == "" else OUT / slug
     out_dir.mkdir(parents=True, exist_ok=True)
-
     canonical = abs_url(slug)
-    schema_graph = [
-        {"@type": "Organization", "name": SITE_NAME, "url": BASE_URL, "logo": BRAND["logo"]},
-        {"@type": "WebSite", "name": SITE_NAME, "url": BASE_URL},
+
+    schema = [
+        {"@type": "Organization", "name": SITE_NAME, "url": site_root(), "logo": BRAND["logo"]},
+        {"@type": "WebSite", "name": SITE_NAME, "url": site_root()},
         {"@type": "WebPage", "name": page["title"], "url": canonical, "description": page["description"], "inLanguage": "en-US"}
     ]
     if page["type"] in ("home", "faq"):
-        schema_graph.append(faq_schema())
+        schema.append(faq_schema())
 
     html = f"""<!doctype html>
 <html lang="en-US">
@@ -332,13 +339,13 @@ def build_page(page):
   <meta property="og:title" content="{escape(page["title"])}">
   <meta property="og:description" content="{escape(page["description"])}">
   <meta property="og:url" content="{canonical}">
-  <meta property="og:image" content="{abs_url('')}assets/mondly-og.jpg">
+  <meta property="og:image" content="{site_root()}assets/mondly-og.jpg">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{escape(page["title"])}">
   <meta name="twitter:description" content="{escape(page["description"])}">
-  <meta name="twitter:image" content="{abs_url('')}assets/mondly-og.jpg">
+  <meta name="twitter:image" content="{site_root()}assets/mondly-og.jpg">
   <style>{CSS}</style>
-  <script type="application/ld+json">{json.dumps({"@context":"https://schema.org","@graph":schema_graph}, ensure_ascii=False)}</script>
+  <script type="application/ld+json">{json.dumps({"@context":"https://schema.org","@graph":schema}, ensure_ascii=False)}</script>
 </head>
 <body>
   <div class="wrap">
@@ -353,8 +360,8 @@ def build_page(page):
             <a class="btn primary" href="{AFF_URL}" rel="sponsored nofollow noopener noreferrer">Start with Mondly</a>
             <a class="btn secondary" href="#details">Explore the page</a>
           </div>
-          <div class="proof" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;color:#dbeafe;font-size:.92rem">
-            {''.join(f'<span>{escape(t)}</span>' for t in page.get("trust", []))}
+          <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;color:#dbeafe;font-size:.92rem">
+            {''.join(f'<span style="padding:8px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04)">{escape(t)}</span>' for t in page.get("trust", []))}
           </div>
         </section>
         <aside class="card">
@@ -368,7 +375,7 @@ def build_page(page):
         </aside>
       </div>
     </main>
-    {render_page_body(page)}
+    {render_body(page)}
     <section class="disclosure">
       <strong>Affiliate disclosure:</strong> This page contains affiliate links. If you click and make a purchase, I may earn a commission at no extra cost to you.
     </section>
@@ -381,20 +388,18 @@ def build_page(page):
     </div>
   </div>
 </body>
-</html>
-"""
+</html>"""
     (out_dir / "index.html").write_text(html, encoding="utf-8")
 
 for page in PAGES:
     build_page(page)
 
-(OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {BASE_URL}/sitemap.xml\n", encoding="utf-8")
+(OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {site_root()}sitemap.xml\n", encoding="utf-8")
 sitemap = ["<?xml version='1.0' encoding='UTF-8'?>", "<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>"]
 for page in PAGES:
     sitemap.append(f"  <url><loc>{abs_url(page['slug'])}</loc><lastmod>{TODAY}</lastmod></url>")
 sitemap.append("</urlset>")
 (OUT / "sitemap.xml").write_text("\n".join(sitemap), encoding="utf-8")
-
 (OUT / "llms.txt").write_text(
     f"""# {SITE_NAME}
 
@@ -420,7 +425,6 @@ sitemap.append("</urlset>")
 """,
     encoding="utf-8"
 )
-
 (OUT / "404.html").write_text(f"""<!doctype html>
 <html lang="en-US">
 <head>
@@ -428,22 +432,11 @@ sitemap.append("</urlset>")
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Page Not Found | {SITE_NAME}</title>
   <meta name="robots" content="noindex,nofollow">
-  <meta http-equiv="refresh" content="5;url={abs_url('')}">
-  <style>
-    body{{margin:0;font-family:Arial,sans-serif;background:#07111f;color:#e5e7eb;display:grid;place-items:center;min-height:100vh;padding:24px}}
-    .box{{max-width:720px;background:#101a2d;border:1px solid #23314a;border-radius:24px;padding:32px}}
-    a{{color:#38bdf8}}
-    .btn{{display:inline-block;margin-top:18px;padding:12px 18px;border-radius:14px;background:#22c55e;color:#04120a;text-decoration:none;font-weight:800}}
-  </style>
+  <meta http-equiv="refresh" content="5;url={site_root()}">
 </head>
 <body>
-  <div class="box">
-    <h1>Page not found</h1>
-    <p>The page you requested does not exist. You will be redirected home shortly.</p>
-    <a class="btn" href="{abs_url('')}">Go home</a>
-  </div>
+  <p>Page not found. Returning home shortly.</p>
 </body>
 </html>""", encoding="utf-8")
-
 (OUT / ".nojekyll").write_text("", encoding="utf-8")
 print("Built subpath-safe site to output/")
