@@ -3,24 +3,155 @@ from datetime import date
 from html import escape
 import json
 import re
-import sys
 
 CONTENT_PATH = Path("content.json")
 OUT = Path("output")
+TODAY = date.today().isoformat()
 
-def load_json_file(path: Path):
-    if not path.exists():
-        sys.exit(f"{path} not found")
-    raw = path.read_text(encoding="utf-8")
+DEFAULT_DATA = {
+    "site_name": "Mondly USA Offer",
+    "base_url": "https://brightlane.github.io/mondly.com",
+    "affiliate_url": "https://convert.ctypy.com/aff_c?offer_id=29588&aff_id=21885",
+    "brand": {
+        "name": "Mondly",
+        "official_url": "https://explore.mondly.com/",
+        "logo": "https://explore.mondly.com/favicon.ico"
+    },
+    "site_summary": "A programmatic affiliate site for USA visitors that explains Mondly and targets long-tail language-learning intent.",
+    "hubs": [
+        {"slug": "review", "title": "Mondly Review", "description": "A practical review of Mondly for USA visitors."},
+        {"slug": "faq", "title": "Mondly FAQ", "description": "Answers to common Mondly questions."},
+        {"slug": "alternatives", "title": "Mondly Alternatives", "description": "Other language learning options compared with Mondly."},
+        {"slug": "guide", "title": "Language Learning Guides", "description": "Practical language-learning guides and use-case pages."},
+        {"slug": "best", "title": "Best Language Learning Picks", "description": "Best-of pages by scenario, skill level, and learning goal."},
+        {"slug": "speaking", "title": "Speaking Practice Pages", "description": "Pages focused on speaking confidence and voice practice."},
+        {"slug": "travel", "title": "Travel Language Pages", "description": "Pages aimed at travelers and trip prep."},
+        {"slug": "beginner", "title": "Beginner Language Pages", "description": "Pages for first-time language learners."},
+        {"slug": "daily", "title": "Daily Practice Pages", "description": "Short-session pages for habit-based learners."}
+    ],
+    "faq": [
+        {"question": "What is Mondly?", "answer": "Mondly is a language learning app focused on short lessons, speech practice, and conversation-style learning."},
+        {"question": "Who is Mondly best for?", "answer": "Mondly is a good fit for beginners, busy adults, and travelers who want practical daily language practice."},
+        {"question": "Does Mondly include speaking practice?", "answer": "Yes. Mondly includes voice practice and speaking-focused learning features."},
+        {"question": "How many languages does Mondly support?", "answer": "Mondly is marketed as a 41-language app."},
+        {"question": "Is this site for USA visitors only?", "answer": "Yes. The affiliate offer and page targeting are intended for USA visitors."}
+    ],
+    "page_templates": {
+        "home": {
+            "title": "Mondly for USA Visitors | Learn Languages Faster",
+            "description": "Discover Mondly for USA visitors. Learn languages with short lessons, voice recognition, and conversation-style practice built for daily progress.",
+            "h1": "Mondly for USA Visitors Who Want Real Language Progress",
+            "hero_badge": "Short daily lessons • Voice practice • Chat-style learning",
+            "hero_lead": "If you want a language app that feels simple, modern, and easy to keep up with, Mondly is built for that. It focuses on short lessons, speaking practice, and conversation-style repetition that fits into a busy day."
+        },
+        "hub": {
+            "review": {
+                "title": "Mondly Review for USA Visitors | Is It Worth It?",
+                "description": "A practical Mondly review covering features, benefits, who it is for, and how the USA offer works.",
+                "h1": "Mondly Review: What USA Visitors Should Know",
+                "hero_badge": "Practical review • USA-focused",
+                "hero_lead": "This page explains what Mondly does well, who it is best for, and what to expect before clicking through to the offer."
+            },
+            "faq": {
+                "title": "Mondly FAQ | USA Visitors",
+                "description": "Answers to common questions about Mondly, language learning, voice practice, and the USA offer.",
+                "h1": "Mondly FAQ",
+                "hero_badge": "Questions answered clearly",
+                "hero_lead": "Use this page to answer the most common questions users have before they click the offer."
+            },
+            "alternatives": {
+                "title": "Mondly Alternatives | USA Language Apps",
+                "description": "Compare Mondly with other language learning apps for USA visitors.",
+                "h1": "Mondly Alternatives",
+                "hero_badge": "Comparison page",
+                "hero_lead": "Some users want a direct comparison before they choose a language app."
+            },
+            "guide": {
+                "title": "Language Learning Guides | USA Visitors",
+                "description": "Helpful language-learning guides and usage pages for USA visitors.",
+                "h1": "Language Learning Guides",
+                "hero_badge": "How-to content",
+                "hero_lead": "These pages answer practical questions and help users learn faster."
+            },
+            "best": {
+                "title": "Best Language Learning Picks | USA Visitors",
+                "description": "Best language-learning pages by goal, level, and situation.",
+                "h1": "Best Language Learning Picks",
+                "hero_badge": "Best-of pages",
+                "hero_lead": "These pages target high-intent searches with useful recommendations."
+            },
+            "speaking": {
+                "title": "Speaking Practice Pages | USA Visitors",
+                "description": "Pages focused on speaking confidence and voice practice.",
+                "h1": "Speaking Practice Pages",
+                "hero_badge": "Voice practice",
+                "hero_lead": "These pages focus on speaking confidence, repetition, and conversational training."
+            },
+            "travel": {
+                "title": "Travel Language Pages | USA Visitors",
+                "description": "Pages aimed at travelers and trip prep.",
+                "h1": "Travel Language Pages",
+                "hero_badge": "Traveler intent",
+                "hero_lead": "These pages help travelers prepare useful language basics before a trip."
+            },
+            "beginner": {
+                "title": "Beginner Language Pages | USA Visitors",
+                "description": "Pages for first-time language learners.",
+                "h1": "Beginner Language Pages",
+                "hero_badge": "New learner intent",
+                "hero_lead": "These pages answer beginner questions and reduce friction for first-time learners."
+            },
+            "daily": {
+                "title": "Daily Practice Pages | USA Visitors",
+                "description": "Short-session pages for habit-based learners.",
+                "h1": "Daily Practice Pages",
+                "hero_badge": "Habit-based learning",
+                "hero_lead": "These pages target users who want short, repeatable sessions."
+            }
+        }
+    },
+    "page_types": ["best", "guide", "compare", "alternatives"],
+    "keywords": [
+        {"slug": "learn-spanish", "head_term": "learn Spanish"},
+        {"slug": "learn-french", "head_term": "learn French"},
+        {"slug": "learn-german", "head_term": "learn German"},
+        {"slug": "learn-italian", "head_term": "learn Italian"},
+        {"slug": "learn-portuguese", "head_term": "learn Portuguese"},
+        {"slug": "learn-japanese", "head_term": "learn Japanese"},
+        {"slug": "learn-korean", "head_term": "learn Korean"},
+        {"slug": "learn-chinese", "head_term": "learn Chinese"},
+        {"slug": "learn-arabic", "head_term": "learn Arabic"},
+        {"slug": "learn-russian", "head_term": "learn Russian"}
+    ],
+    "modifiers": [
+        "for beginners",
+        "for adults",
+        "for travelers",
+        "fast",
+        "easily",
+        "at home",
+        "daily",
+        "with speaking practice",
+        "with voice recognition",
+        "for busy people"
+    ]
+}
+
+def load_data():
+    if not CONTENT_PATH.exists():
+        return DEFAULT_DATA
+    raw = CONTENT_PATH.read_text(encoding="utf-8")
     if not raw.strip():
-        sys.exit(f"{path} is empty")
+        return DEFAULT_DATA
     try:
-        return json.loads(raw)
-    except json.JSONDecodeError as e:
-        preview = raw[:200].replace("\n", "\\n")
-        sys.exit(f"{path} is invalid JSON: {e}. Preview: {preview}")
+        data = json.loads(raw)
+        if not isinstance(data, dict):
+            return DEFAULT_DATA
+        return data
+    except json.JSONDecodeError:
+        return DEFAULT_DATA
 
-DATA = load_json_file(CONTENT_PATH)
+DATA = load_data()
 
 BASE_URL = DATA["base_url"].rstrip("/")
 AFF_URL = DATA["affiliate_url"]
@@ -33,86 +164,8 @@ HUB_TEMPLATES = DATA["page_templates"]["hub"]
 PAGE_TYPES = DATA["page_types"]
 KEYWORDS = DATA["keywords"]
 MODIFIERS = DATA["modifiers"]
-TODAY = date.today().isoformat()
 
 OUT.mkdir(exist_ok=True)
-
-def site_root():
-    return BASE_URL + "/"
-
-def abs_url(slug: str):
-    return site_root() if slug == "" else f"{site_root()}{slug}/"
-
-def rel_url(slug: str):
-    return "./" if slug == "" else f"./{slug}/"
-
-def slugify(text: str):
-    s = text.lower()
-    s = re.sub(r"[^a-z0-9]+", "-", s)
-    return s.strip("-")
-
-def build_pages():
-    pages = []
-    pages.append({
-        "slug": "",
-        "kind": "home",
-        "title": HOME["title"],
-        "description": HOME["description"],
-        "h1": HOME["h1"],
-        "hero_badge": HOME["hero_badge"],
-        "hero_lead": HOME["hero_lead"],
-        "facts": [
-            "Audience: USA visitors",
-            "Format: Affiliate landing page",
-            "Promise: Short daily practice",
-            "Goal: Drive clicks"
-        ]
-    })
-
-    for hub in HUBS:
-        tpl = HUB_TEMPLATES[hub["slug"]]
-        pages.append({
-            "slug": hub["slug"],
-            "kind": "hub",
-            "hub_slug": hub["slug"],
-            "title": tpl["title"],
-            "description": tpl["description"],
-            "h1": tpl["h1"],
-            "hero_badge": tpl["hero_badge"],
-            "hero_lead": tpl["hero_lead"],
-            "facts": [
-                "Focused topic hub",
-                "Links to long-tail pages",
-                "Built for internal navigation",
-                "Targets a distinct intent"
-            ]
-        })
-
-    for ptype in PAGE_TYPES:
-        for kw in KEYWORDS:
-            for mod in MODIFIERS:
-                slug = f"{ptype}/{kw['slug']}-{slugify(mod)}"
-                pages.append({
-                    "slug": slug,
-                    "kind": "longtail",
-                    "page_type": ptype,
-                    "keyword": kw["head_term"],
-                    "modifier": mod,
-                    "title": f"{kw['head_term'].title()} {mod.title()} | Mondly USA",
-                    "description": f"Learn about {kw['head_term']} {mod} with Mondly. USA visitors can compare features, benefits, and practical language-learning tips.",
-                    "h1": f"{kw['head_term'].title()} {mod.title()}",
-                    "hero_badge": f"{ptype.title()} page • USA visitors",
-                    "hero_lead": f"This page targets {kw['head_term']} {mod} and explains how Mondly fits that use case.",
-                    "facts": [
-                        f"Language focus: {kw['head_term']}",
-                        f"Use case: {mod}",
-                        f"Intent family: {ptype}",
-                        "Affiliate offer included"
-                    ]
-                })
-    return pages
-
-PAGES = build_pages()
 
 CSS = """
 :root{
@@ -161,6 +214,18 @@ h1{margin:12px 0 14px;font-size:clamp(2rem,5vw,4.25rem);line-height:1.02;letter-
 @media (max-width:640px){.wrap{padding:14px}h1{font-size:clamp(1.9rem,11vw,3rem)}.btns{display:grid;grid-template-columns:1fr}.btn,.mini{width:100%}.sticky .inner{flex-direction:column;align-items:stretch}}
 """
 
+def site_root():
+    return BASE_URL + "/"
+
+def abs_url(slug: str):
+    return site_root() if slug == "" else f"{site_root()}{slug}/"
+
+def rel_url(slug: str):
+    return "./" if slug == "" else f"./{slug}/"
+
+def slugify(text: str):
+    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+
 def related_links(page):
     links = [{"slug": "", "label": "Home"}]
     for hub in HUBS[:5]:
@@ -177,15 +242,80 @@ def quality_score(page, body_text, links):
     score = 0
     score += 30 if page.get("title") else 0
     score += 20 if page.get("description") else 0
-    score += 20 if len(body_text.split()) >= 220 else 0
+    score += 20 if len(body_text.split()) >= 120 else 0
     score += 10 if len(page.get("facts", [])) >= 3 else 0
     score += 10 if len(links) >= 5 else 0
     score += 10
     return score
 
+def build_pages():
+    pages = []
+    pages.append({
+        "slug": "",
+        "kind": "home",
+        "title": HOME["title"],
+        "description": HOME["description"],
+        "h1": HOME["h1"],
+        "hero_badge": HOME["hero_badge"],
+        "hero_lead": HOME["hero_lead"],
+        "facts": [
+            "Audience: USA visitors",
+            "Format: Affiliate landing page",
+            "Promise: Short daily practice",
+            "Goal: Drive clicks"
+        ]
+    })
+    for hub in HUBS:
+        tpl = HUB_TEMPLATES[hub["slug"]]
+        pages.append({
+            "slug": hub["slug"],
+            "kind": "hub",
+            "title": tpl["title"],
+            "description": tpl["description"],
+            "h1": tpl["h1"],
+            "hero_badge": tpl["hero_badge"],
+            "hero_lead": tpl["hero_lead"],
+            "facts": [
+                "Focused topic hub",
+                "Links to long-tail pages",
+                "Built for internal navigation",
+                "Targets a distinct intent"
+            ]
+        })
+    for ptype in PAGE_TYPES:
+        for kw in KEYWORDS:
+            for mod in MODIFIERS:
+                pages.append({
+                    "slug": f"{ptype}/{kw['slug']}-{slugify(mod)}",
+                    "kind": "longtail",
+                    "page_type": ptype,
+                    "keyword": kw["head_term"],
+                    "modifier": mod,
+                    "title": f"{kw['head_term'].title()} {mod.title()} | Mondly USA",
+                    "description": f"Learn about {kw['head_term']} {mod} with Mondly.",
+                    "h1": f"{kw['head_term'].title()} {mod.title()}",
+                    "hero_badge": f"{ptype.title()} page • USA visitors",
+                    "hero_lead": f"This page targets {kw['head_term']} {mod} and explains how Mondly fits that use case.",
+                    "facts": [
+                        f"Language focus: {kw['head_term']}",
+                        f"Use case: {mod}",
+                        f"Intent family: {ptype}",
+                        "Affiliate offer included"
+                    ]
+                })
+    return pages
+
+PAGES = build_pages()
+
 def render_body(page):
     if page["kind"] == "home":
         return """
+        <section class="meta-row" aria-label="Key facts">
+          <div class="meta"><strong>Audience</strong><br>USA visitors</div>
+          <div class="meta"><strong>Format</strong><br>Affiliate landing page</div>
+          <div class="meta"><strong>Promise</strong><br>Short daily practice</div>
+          <div class="meta"><strong>Goal</strong><br>Drive clicks</div>
+        </section>
         <section class="grid" id="details">
           <article class="card"><h2>What Mondly Does</h2><p>Mondly combines short lessons, speech practice, and conversation-based exercises to help people build vocabulary and confidence one session at a time.</p></article>
           <article class="card"><h2>Why Visitors Click</h2><p>The format is easy to understand: short lessons, voice practice, and a low-friction daily routine.</p></article>
@@ -204,7 +334,7 @@ def render_body(page):
     links = "".join(f'<a class="btn secondary" href="{rel_url(l["slug"])}">{escape(l["label"])}</a>' for l in related_links(page))
     return f"""
     <section class="grid" id="details">
-      <article class="card"><h2>Core angle</h2><p>{escape(page["keyword"])} {escape(page["modifier"])} with Mondly.</p></article>
+      <article class="card"><h2>Core angle</h2><p>{escape(page['keyword'])} {escape(page['modifier'])} with Mondly.</p></article>
       <article class="card"><h2>Why it matters</h2><p>This page targets a specific intent and gives users a fast answer that fits a commercial search.</p></article>
       <article class="card"><h2>Page facts</h2><ul>{facts}</ul></article>
     </section>
@@ -216,31 +346,30 @@ def render_body(page):
 
 def render_page(page):
     canonical = abs_url(page["slug"])
-    links = related_links(page)
     body = render_body(page)
     body_text = re.sub(r"<[^>]+>", " ", body)
+    links = related_links(page)
     score = quality_score(page, body_text, links)
     indexable = score >= 80
     robots = "index,follow" if indexable else "noindex,nofollow"
-    schema_graph = [
+    schema = [
         {"@type": "Organization", "name": SITE_NAME, "url": site_root(), "logo": BRAND["logo"]},
         {"@type": "WebSite", "name": SITE_NAME, "url": site_root()},
         {"@type": "WebPage", "name": page["title"], "url": canonical, "description": page["description"], "inLanguage": "en-US"}
     ]
     if page["kind"] == "home":
-        schema_graph.append({"@type": "FAQPage", "mainEntity": [{"@type":"Question","name":f["question"],"acceptedAnswer":{"@type":"Answer","text":f["answer"]}} for f in FAQS]})
+        schema.append({"@type": "FAQPage", "mainEntity": [{"@type":"Question","name":f["question"],"acceptedAnswer":{"@type":"Answer","text":f["answer"]}} for f in FAQS]})
     return f"""<!doctype html>
 <html lang="en-US">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <base href="{site_root()}">
   <title>{escape(page["title"])}</title>
   <meta name="description" content="{escape(page["description"])}">
   <meta name="robots" content="{robots},max-image-preview:large,max-snippet:-1,max-video-preview:-1">
   <link rel="canonical" href="{canonical}">
   <style>{CSS}</style>
-  <script type="application/ld+json">{json.dumps({"@context":"https://schema.org","@graph":schema_graph}, ensure_ascii=False)}</script>
+  <script type="application/ld+json">{json.dumps({"@context":"https://schema.org","@graph":schema}, ensure_ascii=False)}</script>
 </head>
 <body>
   <div class="wrap">
