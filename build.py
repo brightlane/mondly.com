@@ -11,13 +11,14 @@ OUT = Path("output")
 def load_json_file(path: Path):
     if not path.exists():
         sys.exit(f"{path} not found")
-    raw = path.read_text(encoding="utf-8").strip()
-    if not raw:
+    raw = path.read_text(encoding="utf-8")
+    if not raw.strip():
         sys.exit(f"{path} is empty")
     try:
         return json.loads(raw)
     except json.JSONDecodeError as e:
-        sys.exit(f"{path} is invalid JSON: {e}")
+        preview = raw[:200].replace("\n", "\\n")
+        sys.exit(f"{path} is invalid JSON: {e}. Preview: {preview}")
 
 DATA = load_json_file(CONTENT_PATH)
 
@@ -52,7 +53,6 @@ def slugify(text: str):
 
 def build_pages():
     pages = []
-
     pages.append({
         "slug": "",
         "kind": "home",
@@ -222,18 +222,13 @@ def render_page(page):
     score = quality_score(page, body_text, links)
     indexable = score >= 80
     robots = "index,follow" if indexable else "noindex,nofollow"
-
     schema_graph = [
         {"@type": "Organization", "name": SITE_NAME, "url": site_root(), "logo": BRAND["logo"]},
         {"@type": "WebSite", "name": SITE_NAME, "url": site_root()},
         {"@type": "WebPage", "name": page["title"], "url": canonical, "description": page["description"], "inLanguage": "en-US"}
     ]
-
-    if page["kind"] == "hub":
-        schema_graph.append({"@type": "CollectionPage", "name": page["title"], "url": canonical})
     if page["kind"] == "home":
         schema_graph.append({"@type": "FAQPage", "mainEntity": [{"@type":"Question","name":f["question"],"acceptedAnswer":{"@type":"Answer","text":f["answer"]}} for f in FAQS]})
-
     return f"""<!doctype html>
 <html lang="en-US">
 <head>
@@ -244,13 +239,6 @@ def render_page(page):
   <meta name="description" content="{escape(page["description"])}">
   <meta name="robots" content="{robots},max-image-preview:large,max-snippet:-1,max-video-preview:-1">
   <link rel="canonical" href="{canonical}">
-  <meta property="og:type" content="website">
-  <meta property="og:locale" content="en_US">
-  <meta property="og:site_name" content="{escape(SITE_NAME)}">
-  <meta property="og:title" content="{escape(page["title"])}">
-  <meta property="og:description" content="{escape(page["description"])}">
-  <meta property="og:url" content="{canonical}">
-  <meta property="og:image" content="{site_root()}assets/mondly-og.jpg">
   <style>{CSS}</style>
   <script type="application/ld+json">{json.dumps({"@context":"https://schema.org","@graph":schema_graph}, ensure_ascii=False)}</script>
 </head>
