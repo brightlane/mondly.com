@@ -1,6 +1,7 @@
 from pathlib import Path
 from datetime import date
 import json
+import shutil
 from html import escape
 
 DATA = json.loads(Path("content.json").read_text(encoding="utf-8"))
@@ -14,6 +15,7 @@ FAQ_ITEMS = DATA["faq"]
 ALT_ITEMS = DATA["alternatives"]
 NAV = DATA["nav"]
 
+ROOT = Path(".")
 OUT = Path("output")
 OUT.mkdir(exist_ok=True)
 TODAY = date.today().isoformat()
@@ -259,12 +261,10 @@ def faq_schema():
             {
                 "@type": "Question",
                 "name": item["question"],
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": item["answer"]
-                }
-            } for item in FAQ_ITEMS
-        ]
+                "acceptedAnswer": {"@type": "Answer", "text": item["answer"]},
+            }
+            for item in FAQ_ITEMS
+        ],
     }
 
 def render_faq():
@@ -276,7 +276,13 @@ def render_faq():
             f'<p>{escape(item["answer"])}</p>'
             f'</article>'
         )
-    return f'<section class="card faq" id="faq"><h2>Frequently Asked Questions</h2><p class="answer-note">All answers are shown below.</p>{"".join(blocks)}</section>'
+    return (
+        '<section class="card faq" id="faq">'
+        '<h2>Frequently Asked Questions</h2>'
+        '<p class="answer-note">All answers are shown below.</p>'
+        f'{"".join(blocks)}'
+        '</section>'
+    )
 
 def render_alternatives():
     blocks = [
@@ -334,7 +340,7 @@ def build_page(page):
     schema = [
         {"@type": "Organization", "name": SITE_NAME, "url": site_root(), "logo": BRAND["logo"]},
         {"@type": "WebSite", "name": SITE_NAME, "url": site_root()},
-        {"@type": "WebPage", "name": page["title"], "url": canonical, "description": page["description"], "inLanguage": "en-US"}
+        {"@type": "WebPage", "name": page["title"], "url": canonical, "description": page["description"], "inLanguage": "en-US"},
     ]
     if page["type"] in ("home", "faq"):
         schema.append(faq_schema())
@@ -407,18 +413,28 @@ def build_page(page):
 </html>"""
     (out_dir / "index.html").write_text(html, encoding="utf-8")
 
+    if slug == "":
+        (ROOT / "index.html").write_text(html, encoding="utf-8")
+    else:
+        (ROOT / slug).mkdir(parents=True, exist_ok=True)
+        (ROOT / slug / "index.html").write_text(html, encoding="utf-8")
+
 for page in PAGES:
     build_page(page)
 
-(OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {site_root()}sitemap.xml\n", encoding="utf-8")
+robots = f"User-agent: *\nAllow: /\nSitemap: {site_root()}sitemap.xml\n"
+(OUT / "robots.txt").write_text(robots, encoding="utf-8")
+(ROOT / "robots.txt").write_text(robots, encoding="utf-8")
+
 sitemap = ["<?xml version='1.0' encoding='UTF-8'?>", "<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>"]
 for page in PAGES:
     sitemap.append(f"  <url><loc>{abs_url(page['slug'])}</loc><lastmod>{TODAY}</lastmod></url>")
 sitemap.append("</urlset>")
-(OUT / "sitemap.xml").write_text("\n".join(sitemap), encoding="utf-8")
+sitemap_text = "\n".join(sitemap)
+(OUT / "sitemap.xml").write_text(sitemap_text, encoding="utf-8")
+(ROOT / "sitemap.xml").write_text(sitemap_text, encoding="utf-8")
 
-(OUT / "llms.txt").write_text(
-    f"""# {SITE_NAME}
+llms = f"""# {SITE_NAME}
 
 {DATA["site_summary"]}
 
@@ -439,11 +455,11 @@ sitemap.append("</urlset>")
 - The main action is the affiliate link to Mondly.
 - Use the FAQ page for concise answers.
 - Use the review page for decision support.
-""",
-    encoding="utf-8"
-)
+"""
+(OUT / "llms.txt").write_text(llms, encoding="utf-8")
+(ROOT / "llms.txt").write_text(llms, encoding="utf-8")
 
-(OUT / "404.html").write_text(f"""<!doctype html>
+not_found = f"""<!doctype html>
 <html lang="en-US">
 <head>
   <meta charset="utf-8">
@@ -455,7 +471,11 @@ sitemap.append("</urlset>")
 <body>
   <p>Page not found. Returning home shortly.</p>
 </body>
-</html>""", encoding="utf-8")
+</html>"""
+(OUT / "404.html").write_text(not_found, encoding="utf-8")
+(ROOT / "404.html").write_text(not_found, encoding="utf-8")
 
 (OUT / ".nojekyll").write_text("", encoding="utf-8")
-print("Built subpath-safe site to output/")
+(ROOT / ".nojekyll").write_text("", encoding="utf-8")
+
+print("Built site to output/ and copied generated files to repo root.")
