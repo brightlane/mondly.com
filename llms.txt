@@ -1,21 +1,3 @@
 # Mondly USA Offer
 
-This site helps USA visitors evaluate Mondly, understand its language-learning approach, and click through to the affiliate offer.
-
-## Key pages
-- [Home](https://brightlane.github.io/mondly.com/)
-- [Review](https://brightlane.github.io/mondly.com/review/)
-- [FAQ](https://brightlane.github.io/mondly.com/faq/)
-- [Alternatives](https://brightlane.github.io/mondly.com/alternatives/)
-- [Privacy](https://brightlane.github.io/mondly.com/privacy/)
-- [Terms](https://brightlane.github.io/mondly.com/terms/)
-
-## Brand
-- Name: Mondly
-- Official site: https://explore.mondly.com/
-
-## Guidance
-- This site is written for USA visitors.
-- The main action is the affiliate link to Mondly.
-- Use the FAQ page for concise answers.
-- Use the review page for decision support.
+A programmatic affiliate site for USA visitors that explains Mondly and targets long-tail language-learning intent.
