@@ -6,7 +6,6 @@ from html import escape
 DATA = json.loads(Path("content.json").read_text(encoding="utf-8"))
 
 BASE_URL = DATA["base_url"].rstrip("/")
-BASE_PATH = "/" + BASE_URL.rstrip("/").split("/", 3)[-1] if "github.io" in BASE_URL else ""
 AFF_URL = DATA["affiliate_url"]
 SITE_NAME = DATA["site_name"]
 BRAND = DATA["brand"]
@@ -329,6 +328,7 @@ def build_page(page):
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <base href="{site_root()}">
   <title>{escape(page["title"])}</title>
   <meta name="description" content="{escape(page["description"])}">
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
@@ -400,6 +400,7 @@ for page in PAGES:
     sitemap.append(f"  <url><loc>{abs_url(page['slug'])}</loc><lastmod>{TODAY}</lastmod></url>")
 sitemap.append("</urlset>")
 (OUT / "sitemap.xml").write_text("\n".join(sitemap), encoding="utf-8")
+
 (OUT / "llms.txt").write_text(
     f"""# {SITE_NAME}
 
@@ -425,6 +426,7 @@ sitemap.append("</urlset>")
 """,
     encoding="utf-8"
 )
+
 (OUT / "404.html").write_text(f"""<!doctype html>
 <html lang="en-US">
 <head>
@@ -438,5 +440,6 @@ sitemap.append("</urlset>")
   <p>Page not found. Returning home shortly.</p>
 </body>
 </html>""", encoding="utf-8")
+
 (OUT / ".nojekyll").write_text("", encoding="utf-8")
 print("Built subpath-safe site to output/")
