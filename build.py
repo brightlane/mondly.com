@@ -233,7 +233,7 @@ def abs_url(slug: str) -> str:
 
 def nav_html():
     return "".join(
-        f'<a href="/{"" if item["slug"] == "" else item["slug"] + "/"}">{escape(item["label"])}</a>'
+        f'<a href="{abs_url(item["slug"])[len(BASE_URL):]}">{escape(item["label"])}</a>'
         for item in NAV
     )
 
@@ -244,10 +244,7 @@ def faq_schema():
             {
                 "@type": "Question",
                 "name": item["question"],
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": item["answer"]
-                }
+                "acceptedAnswer": {"@type": "Answer", "text": item["answer"]}
             } for item in FAQ_ITEMS
         ]
     }
@@ -267,9 +264,7 @@ def render_alternatives():
     return f'<section class="card" id="details"><h2>Mondly Alternatives</h2>{"".join(blocks)}</section>'
 
 def render_page_body(page):
-    ptype = page["type"]
-
-    if ptype == "home":
+    if page["type"] == "home":
         return f"""
         <section class="meta-row" aria-label="Key facts">
           <div class="meta"><strong>Audience</strong><br>USA visitors</div>
@@ -277,27 +272,11 @@ def render_page_body(page):
           <div class="meta"><strong>Promise</strong><br>Short daily practice</div>
           <div class="meta"><strong>Goal</strong><br>Drive clicks</div>
         </section>
-
         <section class="grid" id="details">
-          <article class="card">
-            <h2>What Mondly Does</h2>
-            <p>Mondly combines short lessons, speech practice, and conversation-based exercises to help people build vocabulary and confidence one session at a time.</p>
-          </article>
-          <article class="card">
-            <h2>Why Visitors Click</h2>
-            <p>The format is easy to understand: short lessons, voice practice, and a low-friction daily routine.</p>
-          </article>
-          <article class="card">
-            <h2>What You Get</h2>
-            <ul>
-              <li>Short daily lessons.</li>
-              <li>Speaking and voice practice.</li>
-              <li>Conversation-style learning.</li>
-              <li>Simple mobile-friendly flow.</li>
-            </ul>
-          </article>
+          <article class="card"><h2>What Mondly Does</h2><p>Mondly combines short lessons, speech practice, and conversation-based exercises to help people build vocabulary and confidence one session at a time.</p></article>
+          <article class="card"><h2>Why Visitors Click</h2><p>The format is easy to understand: short lessons, voice practice, and a low-friction daily routine.</p></article>
+          <article class="card"><h2>What You Get</h2><ul><li>Short daily lessons.</li><li>Speaking and voice practice.</li><li>Conversation-style learning.</li><li>Simple mobile-friendly flow.</li></ul></article>
         </section>
-
         <section class="steps" id="how" aria-label="How it works">
           <article class="card"><div class="step-num">1</div><h3>Choose your language</h3><p>Pick the language you want to learn and start with a manageable daily routine.</p></article>
           <article class="card"><div class="step-num">2</div><h3>Practice speaking</h3><p>Use conversation-style exercises and voice practice to build confidence.</p></article>
@@ -305,8 +284,7 @@ def render_page_body(page):
         </section>
         {render_faq()}
         """
-
-    if ptype == "review":
+    if page["type"] == "review":
         return """
         <section class="grid" id="details">
           <article class="card"><h2>Quick verdict</h2><p>Mondly is a strong fit if you want short sessions, speech practice, and a simple app-based language routine.</p></article>
@@ -314,22 +292,16 @@ def render_page_body(page):
           <article class="card"><h2>Watch out for</h2><p>As with most language apps, results depend on consistency. Short daily use matters more than occasional long sessions.</p></article>
         </section>
         """
-
-    if ptype == "faq":
+    if page["type"] == "faq":
         return render_faq()
-
-    if ptype == "alternatives":
+    if page["type"] == "alternatives":
         return render_alternatives()
-
-    if ptype == "legal":
-        return """
-        <section class="card">
-          <p>This page is provided for informational and promotional purposes only.</p>
-          <p>Affiliate links may generate a commission without additional cost to you.</p>
-        </section>
-        """
-
-    return ""
+    return """
+    <section class="card">
+      <p>This page is provided for informational and promotional purposes only.</p>
+      <p>Affiliate links may generate a commission without additional cost to you.</p>
+    </section>
+    """
 
 def build_page(page):
     slug = page["slug"]
@@ -337,33 +309,11 @@ def build_page(page):
     out_dir.mkdir(parents=True, exist_ok=True)
 
     canonical = abs_url(slug)
-
     schema_graph = [
-        {
-            "@type": "Organization",
-            "name": SITE_NAME,
-            "url": BASE_URL,
-            "logo": BRAND["logo"]
-        },
-        {
-            "@type": "WebSite",
-            "name": SITE_NAME,
-            "url": BASE_URL
-        },
-        {
-            "@type": "WebPage",
-            "name": page["title"],
-            "url": canonical,
-            "description": page["description"],
-            "inLanguage": "en-US",
-            "isPartOf": {
-                "@type": "WebSite",
-                "name": SITE_NAME,
-                "url": BASE_URL
-            }
-        }
+        {"@type": "Organization", "name": SITE_NAME, "url": BASE_URL, "logo": BRAND["logo"]},
+        {"@type": "WebSite", "name": SITE_NAME, "url": BASE_URL},
+        {"@type": "WebPage", "name": page["title"], "url": canonical, "description": page["description"], "inLanguage": "en-US"}
     ]
-
     if page["type"] in ("home", "faq"):
         schema_graph.append(faq_schema())
 
@@ -382,11 +332,11 @@ def build_page(page):
   <meta property="og:title" content="{escape(page["title"])}">
   <meta property="og:description" content="{escape(page["description"])}">
   <meta property="og:url" content="{canonical}">
-  <meta property="og:image" content="{BASE_URL}/assets/mondly-og.jpg">
+  <meta property="og:image" content="{abs_url('')}assets/mondly-og.jpg">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{escape(page["title"])}">
   <meta name="twitter:description" content="{escape(page["description"])}">
-  <meta name="twitter:image" content="{BASE_URL}/assets/mondly-og.jpg">
+  <meta name="twitter:image" content="{abs_url('')}assets/mondly-og.jpg">
   <style>{CSS}</style>
   <script type="application/ld+json">{json.dumps({"@context":"https://schema.org","@graph":schema_graph}, ensure_ascii=False)}</script>
 </head>
@@ -403,7 +353,7 @@ def build_page(page):
             <a class="btn primary" href="{AFF_URL}" rel="sponsored nofollow noopener noreferrer">Start with Mondly</a>
             <a class="btn secondary" href="#details">Explore the page</a>
           </div>
-          <div class="proof" aria-label="Trust signals" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;color:#dbeafe;font-size:.92rem">
+          <div class="proof" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;color:#dbeafe;font-size:.92rem">
             {''.join(f'<span>{escape(t)}</span>' for t in page.get("trust", []))}
           </div>
         </section>
@@ -439,7 +389,6 @@ for page in PAGES:
     build_page(page)
 
 (OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {BASE_URL}/sitemap.xml\n", encoding="utf-8")
-
 sitemap = ["<?xml version='1.0' encoding='UTF-8'?>", "<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>"]
 for page in PAGES:
     sitemap.append(f"  <url><loc>{abs_url(page['slug'])}</loc><lastmod>{TODAY}</lastmod></url>")
@@ -479,6 +428,7 @@ sitemap.append("</urlset>")
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Page Not Found | {SITE_NAME}</title>
   <meta name="robots" content="noindex,nofollow">
+  <meta http-equiv="refresh" content="5;url={abs_url('')}">
   <style>
     body{{margin:0;font-family:Arial,sans-serif;background:#07111f;color:#e5e7eb;display:grid;place-items:center;min-height:100vh;padding:24px}}
     .box{{max-width:720px;background:#101a2d;border:1px solid #23314a;border-radius:24px;padding:32px}}
@@ -489,13 +439,11 @@ sitemap.append("</urlset>")
 <body>
   <div class="box">
     <h1>Page not found</h1>
-    <p>The page you requested does not exist. Use the home page or the FAQ to continue.</p>
-    <a class="btn" href="/">Go home</a>
+    <p>The page you requested does not exist. You will be redirected home shortly.</p>
+    <a class="btn" href="{abs_url('')}">Go home</a>
   </div>
 </body>
 </html>""", encoding="utf-8")
 
 (OUT / ".nojekyll").write_text("", encoding="utf-8")
-(OUT / "README.txt").write_text("Generated by build.py", encoding="utf-8")
-
-print("Built production site to output/")
+print("Built subpath-safe site to output/")
